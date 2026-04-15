@@ -8,7 +8,8 @@
 
 [build.environment]
   NODE_VERSION = "20"
-  NPM_FLAGS = "--legacy-peer-deps=false"
+  # Garante que devDependencies (TypeScript, Vite) sejam instaladas no build
+  NPM_CONFIG_PRODUCTION = "false"
 
 # ============================================
 # SPA Fallback — todas as rotas servem index.html
@@ -90,9 +91,7 @@
 
 # ============================================
 # Context-specific configs
+# NOTA: NÃO definir NODE_ENV=production aqui — isso faz npm install
+# pular devDependencies (TypeScript, Vite). O Vite já define NODE_ENV
+# automaticamente durante o build.
 # ============================================
-[context.production]
-  environment = { NODE_ENV = "production" }
-
-[context.deploy-preview]
-  environment = { NODE_ENV = "production" }
