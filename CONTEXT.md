@@ -2,79 +2,107 @@
 
 ## Resumo
 
-Site institucional single-page do **CVI - Centro de Vida Independente do Amazonas** (CNPJ: 07.555.086/0001-68). Migrado de WordPress/Divi para uma aplicação React moderna, com foco em performance, acessibilidade e impacto visual.
+Site institucional multi-page do **CVI - Centro de Vida Independente do Amazonas** (CNPJ: 07.555.086/0001-68). Migrado de WordPress/Divi para uma aplicação React moderna, com foco em performance, acessibilidade premium (WCAG 2.1 AA) e conformidade com a LGPD.
+
+Reconhecido pelo Ministério da Saúde como **Centro Especializado em Reabilitação — CER III** (Física, Intelectual e Auditiva), integra a Rede de Cuidados à Pessoa com Deficiência do SUS.
 
 ## Stack Técnica
 
-- **Framework:** React 19 + TypeScript
-- **Build:** Vite 6
+- **Framework:** React 19 + TypeScript 5
+- **Build:** Vite 8
 - **Estilização:** Tailwind CSS 4 (design tokens via `@theme`)
-- **Animações:** Framer Motion 12
+- **Animações:** Framer Motion 12 (respeita `prefers-reduced-motion`)
 - **Ícones:** Lucide React
-- **Roteamento:** React Router DOM 7 (preparado, mas atualmente single-page)
+- **Roteamento:** React Router DOM 7 (multi-page: `/`, `/servicos`, `/galeria`, `/privacidade`, `/brandbook`)
+- **QR Code Pix:** `qrcode.react`
 
 ## Regras de Negócio
 
 ### Sobre a Instituição
-- O CVI é um centro de reabilitação biopsicossocial sem fins lucrativos
+- Centro de reabilitação biopsicossocial sem fins lucrativos
 - Atendimento 100% gratuito, financiado pelo SUS (Fundo Nacional de Saúde)
 - Termos de Cooperação 001/2021 e 001/2024 com a SES/AM
+- Reconhecido pelo Ministério da Saúde como **CER III** (Física, Intelectual e Auditiva)
 - Atende pessoas com deficiência permanente ou temporária, familiares e comunidade
 - Abrange 50+ municípios do estado do Amazonas
 
+### Contato Oficial
+- **E-mail:** `cvi.amazonas@gmail.com`
+- **Telefone / WhatsApp:** (92) 99116-3746
+- **Instagram:** `@cvi.am`
+- **Endereço:** Manaus, Amazonas — Brasil (endereço completo pendente)
+
 ### Público-Alvo do Site
-1. **Pacientes e familiares** — buscar informações sobre serviços
+1. **Pacientes e familiares** — buscar informações sobre serviços e encaminhamento
 2. **Comunidade** — conhecer o trabalho do CVI
 3. **Doadores** — contribuir financeiramente ou como voluntários
 4. **Parceiros institucionais** — estabelecer parcerias
 5. **Governo e órgãos públicos** — transparência e prestação de contas
 
 ### Requisitos de Acessibilidade
-- WCAG AA como padrão mínimo (público-alvo são PcDs)
-- Semântica HTML correta
-- Navegação por teclado
-- Contraste de cores adequado
-- Foco visível em elementos interativos
-- Alt text em todas as imagens
-- Futuramente: VLibras, alto contraste, ajuste de fonte
+- WCAG 2.1 nível AA como padrão mínimo (público-alvo inclui PcDs)
+- Semântica HTML correta (landmarks, headings, listas)
+- Navegação por teclado completa
+- Contraste mínimo 4.5:1 para corpo de texto
+- Foco visível 3px `primary-500` com offset 3px
+- Alt text em todas as imagens; decorativas com `aria-hidden="true"`
+- **AccessibilityToolbar:** fonte (3 níveis), alto contraste, pausar animações, sublinhar links, VLibras oficial gov.br, restaurar padrões
+- `prefers-reduced-motion` respeitado em CSS e Framer Motion
 
 ### Tom e Copy
 - **Tom:** Profissional, acolhedor, esperançoso, empoderador
-- **Linguagem:** Inclusiva e acessível
+- **Linguagem:** Inclusiva e acessível, sem jargão técnico excessivo
 - **Foco:** Storytelling de impacto e transformação de vidas
 - **Idioma:** Português Brasileiro (pt-BR)
+- **Regra de ouro:** se a frase soaria estranha dita em voz alta para alguém vivendo o momento mais difícil da vida, reescreva.
 
 ## Design System
 
-### Paleta de Cores
-| Token | Hex | Uso |
-|---|---|---|
-| `primary-500` | #0fa8bd | Teal — saúde, confiança |
-| `secondary-500` | #d43d48 | Coral — acolhimento |
-| `accent-500` | #10b981 | Verde — esperança |
-| `warm-500` | #f59e0b | Dourado — excelência |
-| `neutral-900` | #0f172a | Texto principal |
+### Paleta de Cores (design tokens Tailwind 4)
+| Família | Shade principal | Hex | Uso |
+|---|---|---|---|
+| Primary (Teal) | 500 / 700 | `#0fa8bd` / `#0a7688` | Saúde, confiança, CTAs institucionais |
+| Secondary (Coral) | 500 | `#d43d48` | Acolhimento, CTA de doação |
+| Accent (Verde) | 500 | `#10b981` | Esperança, sucesso, vida |
+| Warm (Dourado) | 500 | `#f59e0b` | Excelência, status "em breve" |
+| Neutral | 900 / 700 | `#0f172a` / `#334155` | Texto principal / corpo |
 
 ### Tipografia
-- **Headings:** Plus Jakarta Sans (Google Fonts)
-- **Body:** Inter (Google Fonts)
+- **Headings:** Plus Jakarta Sans (500, 600, 700, 800) — tracking-tight
+- **Body:** Inter (400, 500, 600, 700) — line-height 1.7
+- Ambas via Google Fonts com `preconnect` + `display=swap`
+
+### Numeração editorial
+Cada seção da home exibe um número grande (00–10) no canto como elemento decorativo editorial. **Regra:** ao adicionar/remover seções, renumerar todas em cascata.
 
 ### Componentes Reutilizáveis
-- `Button` — variantes: primary, secondary, outline, ghost
+- `Button` — variantes: primary, secondary, outline, ghost · sizes: sm, md, lg
 - `SectionLabel` — badge com pill para identificar seções
+- `CookieConsent` — banner sticky + modal com 3 categorias
 
 ## Decisões Arquiteturais
 
-1. **Single-page vs Multi-page:** Optamos por single-page para dar consistência e volume ao site, já que o conteúdo não justifica múltiplas rotas separadas
-2. **Conteúdo centralizado:** Todo o conteúdo textual está em `src/data/content.ts`, facilitando manutenção e futura integração com CMS
-3. **Design tokens no CSS:** Usamos `@theme` do Tailwind 4 para definir tokens, mantendo consistência
-4. **Framer Motion:** Animações suaves que respeitam `prefers-reduced-motion`
-5. **Sem backend:** Site estático, ideal para deploy em CDN
+1. **Multi-page com React Router:** 5 rotas (`/`, `/servicos`, `/galeria`, `/privacidade`, `/brandbook`) — permite deep-linking, melhor SEO por página e compartilhamento de URLs específicas. A home permanece single-page narrativa.
+2. **Conteúdo centralizado:** Todo o conteúdo textual está em `src/data/content.ts`, organizado por seção/rota. Facilita manutenção, futura integração com CMS headless e tradução.
+3. **Design tokens via `@theme`:** Tailwind 4 declarativo, sem arquivo de config — mudar uma cor propaga por todo o projeto.
+4. **Framer Motion com `viewport.once`:** animações disparam uma vez por reveal (não repetem ao rolar pra cima e voltar).
+5. **Sem backend ainda:** Site estático, ideal para deploy em CDN. Preparado para integração futura de gateway de pagamento (doações) e formulário de contato.
+6. **LGPD:** Banner de cookies + política completa. Nenhum tracker ativo até agora — a estrutura está pronta para receber GA4 quando aprovado, consumindo `preferences.analytics` via `useCookieConsent()`.
+
+## Estado de Doações (Pré-Integração)
+
+- Página home `/#doar` com QR Code Pix estático (chave CNPJ) + botão "Copiar chave"
+- Nenhum gateway configurado ainda — aguardando chaves de API do cliente
+- Candidatos sugeridos: **Mercado Pago Checkout Pro** (rápido), **Asaas ONG tier** (melhor taxa pós-certificação CEBAS), **PagSeguro PagBank**
+- Quando chegar a hora: criar `src/services/donationAPI.ts` como camada de abstração tipada, com stub retornando erro controlado e integração plugável via `import.meta.env.VITE_*`
 
 ## Padrões de Código
 
 - Componentes funcionais com TypeScript
-- Props tipadas com interfaces
-- Hooks customizados para lógica reutilizável
-- Componentes organizados por responsabilidade (layout, sections, ui)
+- Props tipadas com interfaces locais
+- Hooks customizados para lógica reutilizável (`src/hooks/`)
+- Componentes organizados por responsabilidade (`layout/`, `sections/`, `ui/`)
 - CSS utilitário via Tailwind, sem CSS modules
+- Imports com alias `@/` (configurado em `tsconfig.json` e `vite.config.ts`)
+- Ícones sempre com `aria-hidden="true"` quando decorativos
+- Eventos customizados `cvi:*` para comunicação entre componentes sem prop-drilling (ex: `cvi:open-cookie-preferences`, `cvi:consent-change`)

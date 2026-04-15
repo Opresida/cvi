@@ -25,7 +25,7 @@ export function Donate() {
         aria-hidden="true"
         className="absolute -top-10 left-0 text-[20rem] font-black text-secondary-100/50 leading-none select-none pointer-events-none hidden lg:block"
       >
-        07
+        09
       </div>
 
       <div className="relative mx-auto max-w-6xl px-6 sm:px-10 lg:px-16">

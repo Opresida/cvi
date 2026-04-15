@@ -9,6 +9,7 @@ import {
   RotateCcw,
   X,
   Hand,
+  Cookie,
 } from "lucide-react";
 import { useAccessibilitySettings } from "@/hooks/useAccessibilitySettings";
 
@@ -221,6 +222,18 @@ export function AccessibilityToolbar() {
               )}
             </button>
           </div>
+
+          {/* Preferências de cookies */}
+          <button
+            type="button"
+            onClick={() =>
+              window.dispatchEvent(new CustomEvent("cvi:open-cookie-preferences"))
+            }
+            className="w-full flex items-center justify-center gap-2 py-2.5 mb-1 text-sm font-semibold text-primary-700 hover:text-primary-800 border border-primary-200 hover:bg-primary-50 rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-primary-500 focus-visible:ring-offset-3"
+          >
+            <Cookie size={14} aria-hidden="true" />
+            Preferências de cookies
+          </button>
 
           {/* Restaurar padrões */}
           <button

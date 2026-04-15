@@ -1,4 +1,5 @@
-import { Heart, Shield, Accessibility } from "lucide-react";
+import { Heart, Shield, Accessibility, Cookie } from "lucide-react";
+import { Link } from "react-router-dom";
 import { siteContent } from "@/data/content";
 import logoImg from "@/assets/images/logo-white.png";
 
@@ -61,6 +62,12 @@ export function Footer() {
                 </a>
               ))}
             </div>
+
+            <img
+              src="https://i.imgur.com/Ia0Dn7G.png"
+              alt="Selos institucionais do CVI Amazonas"
+              className="mt-6 w-full max-w-sm h-auto object-contain"
+            />
           </div>
 
           {/* Navegação */}
@@ -119,8 +126,34 @@ export function Footer() {
           </ul>
         </div>
 
+        {/* Links legais */}
+        <div className="mt-10 pt-6 border-t border-neutral-800 flex flex-wrap items-center gap-x-6 gap-y-2 text-xs">
+          <Link
+            to="/privacidade"
+            className="text-neutral-400 hover:text-primary-400 transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-primary-500 focus-visible:ring-offset-3 focus-visible:ring-offset-neutral-900 rounded-sm"
+          >
+            Política de Privacidade
+          </Link>
+          <button
+            type="button"
+            onClick={() =>
+              window.dispatchEvent(new CustomEvent("cvi:open-cookie-preferences"))
+            }
+            className="inline-flex items-center gap-1.5 text-neutral-400 hover:text-primary-400 transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-primary-500 focus-visible:ring-offset-3 focus-visible:ring-offset-neutral-900 rounded-sm"
+          >
+            <Cookie size={12} aria-hidden="true" />
+            Preferências de Cookies
+          </button>
+          <Link
+            to="/#contato"
+            className="text-neutral-400 hover:text-primary-400 transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-primary-500 focus-visible:ring-offset-3 focus-visible:ring-offset-neutral-900 rounded-sm"
+          >
+            Contato
+          </Link>
+        </div>
+
         {/* Bottom bar */}
-        <div className="mt-10 pt-6 border-t border-neutral-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div className="mt-6 pt-6 border-t border-neutral-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <p className="text-xs text-neutral-500">{footer.copyright}</p>
           <p className="flex items-center gap-1.5 text-xs text-neutral-500">
             Feito com

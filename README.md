@@ -48,6 +48,16 @@ npm run dev
 
 O app abre automaticamente em **http://localhost:5000**
 
+### Rotas disponíveis
+
+| Rota | Página |
+|---|---|
+| `/` | Home (single-page com 10 seções) |
+| `/servicos` | Catálogo completo de serviços (especialidades, projetos, patologias, modalidades, entrada, elegibilidade, alta) |
+| `/galeria` | Galeria com 5 pastas e lightbox acessível |
+| `/privacidade` | Política de Privacidade e Cookies (LGPD) |
+| `/brandbook` | Brandbook & UI System + gerador de assinatura de e-mail |
+
 ### Scripts
 | Comando | Descrição |
 |---|---|
@@ -75,33 +85,43 @@ cvi/
 │   ├── components/
 │   │   ├── layout/               # Estrutura global
 │   │   │   ├── Header.tsx              # Nav fixa + scrollspy + mobile menu
-│   │   │   ├── Footer.tsx              # Selos, parceiros, financiamento
+│   │   │   ├── Footer.tsx              # Selos, parceiros, links legais
 │   │   │   ├── SkipLinks.tsx           # Pular para conteúdo/nav
-│   │   │   ├── AccessibilityToolbar.tsx # Toolbar WCAG + VLibras
+│   │   │   ├── AccessibilityToolbar.tsx # Toolbar WCAG + VLibras + cookies
+│   │   │   ├── CookieConsent.tsx       # Banner LGPD + modal de preferências
 │   │   │   ├── FloatingDonateCTA.tsx   # Botão flutuante de doação
 │   │   │   └── FloatingWhatsApp.tsx    # Botão flutuante WhatsApp
 │   │   ├── sections/             # Seções da home single-page
-│   │   │   ├── Hero.tsx                # Headline + ondas SVG
+│   │   │   ├── Hero.tsx                # 00 — Headline + ondas SVG
 │   │   │   ├── Showcase.tsx            # Imagem com orbital animada
-│   │   │   ├── About.tsx               # Manifesto + timeline + valores
-│   │   │   ├── Impact.tsx              # Escada de autonomia (números)
-│   │   │   ├── Services.tsx            # Diagrama circular interativo
-│   │   │   ├── Pillars.tsx             # 5 pilares editoriais
-│   │   │   ├── Team.tsx                # Equipe + especialidades
-│   │   │   ├── Testimonials.tsx        # Carrossel acessível
-│   │   │   ├── Donate.tsx              # Breakdown + QR Code Pix
-│   │   │   └── Contact.tsx             # Tipografia + mapa + form
+│   │   │   ├── About.tsx               # 01 — Manifesto + timeline + valores (inclui CER III)
+│   │   │   ├── Impact.tsx              # 02 — Escada de autonomia (números)
+│   │   │   ├── Services.tsx            # 03 — Diagrama circular + CTA p/ página completa
+│   │   │   ├── Pillars.tsx             # 04 — 5 pilares editoriais
+│   │   │   ├── Team.tsx                # 05 — Equipe + especialidades
+│   │   │   ├── Testimonials.tsx        # 06 — Carrossel acessível
+│   │   │   ├── Faq.tsx                 # 07 — Accordion de dúvidas frequentes
+│   │   │   ├── Galeria.tsx             # 08 — Preview das 5 pastas + CTA
+│   │   │   ├── Donate.tsx              # 09 — Breakdown + QR Code Pix
+│   │   │   └── Contact.tsx             # 10 — Tipografia + mapa + form
 │   │   └── ui/                   # Componentes reutilizáveis
 │   │       ├── Button.tsx
 │   │       └── SectionLabel.tsx
+│   ├── pages/                    # Rotas
+│   │   ├── Home.tsx                    # Composição das seções da home
+│   │   ├── Servicos.tsx                # Catálogo completo (7 blocos editoriais)
+│   │   ├── Galeria.tsx                 # Abas por pasta + lightbox + CTA final
+│   │   ├── Privacidade.tsx             # Política LGPD (10 seções)
+│   │   └── Brandbook.tsx               # Brandbook + gerador de assinatura de e-mail
 │   ├── data/
-│   │   └── content.ts            # Toda copy + dados estáticos
+│   │   └── content.ts            # Toda copy + dados estáticos (nav, home, servicesPage, gallery, faq)
 │   ├── hooks/
 │   │   ├── useCountUp.ts                # Contador animado em scroll
 │   │   ├── useScrollspy.ts              # Highlight nav ativa
 │   │   ├── useReducedMotion.ts          # Detecta preferência do SO
-│   │   └── useAccessibilitySettings.ts  # Toolbar (localStorage)
-│   ├── App.tsx                   # Composição das seções
+│   │   ├── useAccessibilitySettings.ts  # Toolbar (localStorage)
+│   │   └── useCookieConsent.ts          # Consentimento LGPD (localStorage versionado)
+│   ├── App.tsx                   # BrowserRouter + Routes + CookieConsent global
 │   ├── main.tsx                  # Bootstrap React
 │   └── index.css                 # Design tokens + Tailwind + a11y CSS
 ├── index.html                    # Schema.org + meta tags + fontes
@@ -156,7 +176,8 @@ Botão sticky lateral esquerda (top-28). Recursos:
 - ✅ Landmarks ARIA (`banner`, `main`, `contentinfo`, `navigation`)
 - ✅ `aria-current="location"` no link da seção ativa
 - ✅ `aria-live` em notificações dinâmicas (Pix copiado, form enviado)
-- ✅ `aria-expanded` / `aria-controls` em disclosures e menu mobile
+- ✅ `aria-expanded` / `aria-controls` em disclosures, FAQ e menu mobile
+- ✅ Lightbox da galeria navegável por `←` / `→` / `ESC`
 - ✅ Carrossel de testimoniais navegável por `←` / `→`
 - ✅ Foco visível 3px `primary-500` + offset 3px
 - ✅ Ícones decorativos com `aria-hidden="true"`
@@ -164,6 +185,7 @@ Botão sticky lateral esquerda (top-28). Recursos:
 - ✅ Formulário com `<label>`, `aria-required`, status `aria-live`
 - ✅ Texto alternativo em todas imagens; molduras decorativas com `aria-hidden`
 - ✅ `prefers-reduced-motion` global respeitado em CSS + Framer Motion
+- ✅ Banner de cookies LGPD com focus trap + ESC + sincronização entre abas
 
 ---
 

@@ -1,41 +1,22 @@
-import { Header } from "@/components/layout/Header";
-import { Footer } from "@/components/layout/Footer";
-import { SkipLinks } from "@/components/layout/SkipLinks";
-import { AccessibilityToolbar } from "@/components/layout/AccessibilityToolbar";
-import { FloatingDonateCTA } from "@/components/layout/FloatingDonateCTA";
-import { FloatingWhatsApp } from "@/components/layout/FloatingWhatsApp";
-import { Hero } from "@/components/sections/Hero";
-import { Showcase } from "@/components/sections/Showcase";
-import { About } from "@/components/sections/About";
-import { Impact } from "@/components/sections/Impact";
-import { Services } from "@/components/sections/Services";
-import { Pillars } from "@/components/sections/Pillars";
-import { Team } from "@/components/sections/Team";
-import { Testimonials } from "@/components/sections/Testimonials";
-import { Donate } from "@/components/sections/Donate";
-import { Contact } from "@/components/sections/Contact";
+import { Routes, Route } from "react-router-dom";
+import { Home } from "@/pages/Home";
+import { Servicos } from "@/pages/Servicos";
+import { Galeria } from "@/pages/Galeria";
+import { Privacidade } from "@/pages/Privacidade";
+import { Brandbook } from "@/pages/Brandbook";
+import { CookieConsent } from "@/components/layout/CookieConsent";
 
 function App() {
   return (
     <>
-      <SkipLinks />
-      <Header />
-      <AccessibilityToolbar />
-      <main id="main-content" role="main">
-        <Hero />
-        <Showcase />
-        <About />
-        <Impact />
-        <Services />
-        <Pillars />
-        <Team />
-        <Testimonials />
-        <Donate />
-        <Contact />
-      </main>
-      <Footer />
-      <FloatingDonateCTA />
-      <FloatingWhatsApp />
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/servicos" element={<Servicos />} />
+        <Route path="/galeria" element={<Galeria />} />
+        <Route path="/privacidade" element={<Privacidade />} />
+        <Route path="/brandbook" element={<Brandbook />} />
+      </Routes>
+      <CookieConsent />
     </>
   );
 }

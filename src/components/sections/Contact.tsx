@@ -29,7 +29,7 @@ export function Contact() {
         aria-hidden="true"
         className="absolute -top-10 right-0 text-[20rem] font-black text-primary-50 leading-none select-none pointer-events-none hidden lg:block"
       >
-        08
+        10
       </div>
 
       <div className="relative mx-auto max-w-6xl px-6 sm:px-10 lg:px-16">

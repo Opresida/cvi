@@ -1,6 +1,7 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Activity, ShieldCheck, Heart, BookOpen, ChevronDown } from "lucide-react";
+import { Activity, ShieldCheck, Heart, BookOpen, ChevronDown, ArrowRight } from "lucide-react";
 import { siteContent } from "@/data/content";
 
 const { services } = siteContent;
@@ -167,6 +168,52 @@ export function Services() {
             })}
           </ul>
         </div>
+
+        {/* CTA — convite para a página completa de serviços */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.4 }}
+          transition={{ duration: 0.5 }}
+          className="mt-20 lg:mt-28 relative overflow-hidden rounded-3xl bg-gradient-to-br from-primary-700 to-primary-900 p-10 lg:p-16"
+        >
+          <div
+            aria-hidden="true"
+            className="absolute -top-20 -right-20 h-64 w-64 rounded-full bg-primary-400/20 blur-3xl"
+          />
+          <div
+            aria-hidden="true"
+            className="absolute -bottom-20 -left-20 h-64 w-64 rounded-full bg-accent-400/10 blur-3xl"
+          />
+
+          <div className="relative grid lg:grid-cols-[1.4fr_auto] items-center gap-8 lg:gap-12">
+            <div className="max-w-2xl">
+              <span className="inline-block text-xs font-bold uppercase tracking-[0.3em] text-primary-200 mb-4">
+                Catálogo completo
+              </span>
+              <h3 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white leading-[1.1] tracking-tight mb-5">
+                Conheça todos os serviços do CVI Amazonas.
+              </h3>
+              <p className="text-base sm:text-lg text-primary-100 leading-[1.7]">
+                Acesse a página dedicada com o detalhamento completo de cada especialidade,
+                equipe responsável, público atendido e formas de encaminhamento — tudo reunido
+                em um só lugar.
+              </p>
+            </div>
+
+            <Link
+              to="/servicos"
+              className="group inline-flex items-center justify-center gap-3 px-8 py-4 rounded-xl bg-white text-primary-800 font-bold text-base hover:bg-primary-50 transition-colors shadow-xl shadow-primary-900/30 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-white focus-visible:ring-offset-3 focus-visible:ring-offset-primary-800 whitespace-nowrap"
+            >
+              Ver todos os serviços
+              <ArrowRight
+                size={18}
+                aria-hidden="true"
+                className="transition-transform group-hover:translate-x-1"
+              />
+            </Link>
+          </div>
+        </motion.div>
       </div>
     </section>
   );
