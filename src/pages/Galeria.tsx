@@ -133,7 +133,7 @@ export function Galeria() {
             >
               {gallery.folders.map((f) => {
                 const isActive = activeSlug === f.slug;
-                const count = f.photos.length;
+                const count: number = f.photos.length;
                 return (
                   <button
                     key={f.slug}

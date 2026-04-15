@@ -61,7 +61,7 @@ export function Galeria() {
           className="grid grid-cols-2 lg:grid-cols-5 gap-4 lg:gap-6 mb-12"
         >
           {gallery.folders.map((folder, i) => {
-            const count = folder.photos.length;
+            const count: number = folder.photos.length;
             const cover = (folder as { cover?: string }).cover;
             return (
               <motion.li
