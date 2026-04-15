@@ -1,0 +1,260 @@
+@import "tailwindcss";
+
+/* ============================================
+   CVI - DESIGN SYSTEM TOKENS
+   Centro de Vida Independente do Amazonas
+   ============================================ */
+
+@theme {
+  --color-primary-50: #e6f7f9;
+  --color-primary-100: #b3e8ef;
+  --color-primary-200: #80d9e5;
+  --color-primary-300: #4dcadb;
+  --color-primary-400: #26bfd4;
+  --color-primary-500: #0fa8bd;
+  --color-primary-600: #0d94a7;
+  --color-primary-700: #0a7688;
+  --color-primary-800: #085969;
+  --color-primary-900: #053c47;
+
+  --color-secondary-50: #fef0f1;
+  --color-secondary-100: #fcd1d4;
+  --color-secondary-200: #f9a3a9;
+  --color-secondary-300: #f0737c;
+  --color-secondary-400: #e5525d;
+  --color-secondary-500: #d43d48;
+  --color-secondary-600: #b8333d;
+  --color-secondary-700: #932932;
+  --color-secondary-800: #6e1f26;
+  --color-secondary-900: #49151a;
+
+  --color-accent-50: #ecfdf5;
+  --color-accent-100: #d1fae5;
+  --color-accent-200: #a7f3d0;
+  --color-accent-300: #6ee7b7;
+  --color-accent-400: #34d399;
+  --color-accent-500: #10b981;
+  --color-accent-600: #059669;
+  --color-accent-700: #047857;
+  --color-accent-800: #065f46;
+  --color-accent-900: #064e3b;
+
+  --color-warm-50: #fffbeb;
+  --color-warm-100: #fef3c7;
+  --color-warm-200: #fde68a;
+  --color-warm-300: #fcd34d;
+  --color-warm-400: #fbbf24;
+  --color-warm-500: #f59e0b;
+
+  --color-neutral-50: #f8fafb;
+  --color-neutral-100: #f1f4f6;
+  --color-neutral-200: #e2e8ed;
+  --color-neutral-300: #cbd5de;
+  --color-neutral-400: #94a3b8;
+  --color-neutral-500: #64748b;
+  --color-neutral-600: #475569;
+  --color-neutral-700: #334155;
+  --color-neutral-800: #1e293b;
+  --color-neutral-900: #0f172a;
+
+  --color-success: #10b981;
+  --color-warning: #f59e0b;
+  --color-error: #ef4444;
+  --color-info: #0fa8bd;
+
+  --font-heading: "Plus Jakarta Sans", system-ui, sans-serif;
+  --font-body: "Inter", system-ui, sans-serif;
+
+  --shadow-soft: 0 2px 15px -3px rgba(15, 23, 42, 0.08), 0 4px 6px -4px rgba(15, 23, 42, 0.04);
+  --shadow-card: 0 4px 25px -5px rgba(15, 23, 42, 0.1), 0 8px 10px -6px rgba(15, 23, 42, 0.05);
+  --shadow-elevated: 0 10px 40px -10px rgba(15, 23, 42, 0.15), 0 20px 25px -15px rgba(15, 23, 42, 0.08);
+}
+
+/* ============================================
+   FONT SCALE (controlado pela toolbar de acessibilidade)
+   ============================================ */
+html {
+  font-size: 16px;
+}
+html[data-font-size="large"] { font-size: 18px; }
+html[data-font-size="xlarge"] { font-size: 20px; }
+
+/* ============================================
+   BASE STYLES
+   ============================================ */
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    font-family: var(--font-body);
+    color: var(--color-neutral-700);
+    background-color: white;
+    line-height: 1.7;
+    margin: 0;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    line-height: 1.15;
+    color: var(--color-neutral-900);
+    letter-spacing: -0.02em;
+  }
+
+  ::selection {
+    background-color: var(--color-primary-200);
+    color: var(--color-primary-900);
+  }
+
+  :focus-visible {
+    outline: 3px solid var(--color-primary-500);
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+
+  img {
+    max-width: 100%;
+    height: auto;
+  }
+}
+
+/* ============================================
+   ACESSIBILIDADE: REDUCED MOTION
+   Respeita preferência do usuário (SO) + toggle manual
+   ============================================ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+html[data-motion="off"] *,
+html[data-motion="off"] *::before,
+html[data-motion="off"] *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+  scroll-behavior: auto !important;
+}
+
+/* ============================================
+   ACESSIBILIDADE: ALTO CONTRASTE
+   Paleta preto/amarelo/branco (padrão baixa visão)
+   ============================================ */
+html[data-contrast="high"] {
+  --color-primary-50: #000000;
+  --color-primary-100: #000000;
+  --color-primary-500: #ffff00;
+  --color-primary-600: #ffff00;
+  --color-primary-700: #ffff00;
+  --color-primary-800: #000000;
+  --color-primary-900: #000000;
+  --color-neutral-50: #000000;
+  --color-neutral-100: #000000;
+  --color-neutral-200: #ffff00;
+  --color-neutral-500: #ffffff;
+  --color-neutral-600: #ffffff;
+  --color-neutral-700: #ffffff;
+  --color-neutral-800: #ffffff;
+  --color-neutral-900: #ffffff;
+}
+
+html[data-contrast="high"] body {
+  background: #000000 !important;
+  color: #ffffff !important;
+}
+
+html[data-contrast="high"] h1,
+html[data-contrast="high"] h2,
+html[data-contrast="high"] h3,
+html[data-contrast="high"] h4,
+html[data-contrast="high"] h5,
+html[data-contrast="high"] h6 {
+  color: #ffff00 !important;
+}
+
+html[data-contrast="high"] a {
+  color: #ffff00 !important;
+  text-decoration: underline !important;
+}
+
+html[data-contrast="high"] button,
+html[data-contrast="high"] [role="button"] {
+  background: #ffff00 !important;
+  color: #000000 !important;
+  border: 2px solid #ffffff !important;
+}
+
+html[data-contrast="high"] img {
+  filter: grayscale(100%) contrast(120%);
+}
+
+/* ============================================
+   ACESSIBILIDADE: SUBLINHAR LINKS
+   ============================================ */
+html[data-links="underlined"] a {
+  text-decoration: underline !important;
+  text-underline-offset: 3px;
+}
+
+/* ============================================
+   SKIP LINKS (acessibilidade por teclado)
+   ============================================ */
+.skip-link {
+  position: absolute;
+  top: -200px;
+  left: 1rem;
+  z-index: 100;
+  padding: 0.75rem 1.25rem;
+  background: var(--color-primary-700);
+  color: white;
+  font-weight: 600;
+  border-radius: 0.5rem;
+  box-shadow: var(--shadow-card);
+  transition: top 0.15s ease;
+}
+.skip-link:focus {
+  top: 1rem;
+}
+
+/* ============================================
+   UTILITIES
+   ============================================ */
+
+@layer utilities {
+  .text-gradient {
+    background: linear-gradient(135deg, var(--color-primary-600), var(--color-primary-400));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+  }
+}
+
+/* ============================================
+   VLIBRAS (widget oficial gov.br)
+   ============================================ */
+[vw] {
+  z-index: 9999;
+}
