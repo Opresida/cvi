@@ -1,14 +1,19 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, useLocation } from "react-router-dom";
 import { Home } from "@/pages/Home";
 import { Servicos } from "@/pages/Servicos";
 import { Galeria } from "@/pages/Galeria";
 import { Privacidade } from "@/pages/Privacidade";
 import { Brandbook } from "@/pages/Brandbook";
 import { CookieConsent } from "@/components/layout/CookieConsent";
+import { SplashLoader } from "@/components/layout/SplashLoader";
 
 function App() {
+  const { pathname } = useLocation();
+  const showSplash = pathname === "/";
+
   return (
     <>
+      {showSplash && <SplashLoader />}
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/servicos" element={<Servicos />} />

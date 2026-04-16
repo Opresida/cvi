@@ -1,6 +1,15 @@
 @import "tailwindcss";
 
 /* ============================================
+   CVI - SPLASH LOADER
+   ============================================ */
+
+@keyframes splash-wave {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(-25%); }
+}
+
+/* ============================================
    CVI - DESIGN SYSTEM TOKENS
    Centro de Vida Independente do Amazonas
    ============================================ */
