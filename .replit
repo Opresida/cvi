@@ -1,0 +1,13 @@
+run = "npm run dev -- --host 0.0.0.0"
+entrypoint = "src/App.tsx"
+
+[nix]
+channel = "stable-24_05"
+
+[deployment]
+run = ["sh", "-c", "npx serve dist -s -l 3000"]
+build = ["sh", "-c", "npm run build"]
+
+[[ports]]
+localPort = 5000
+externalPort = 80

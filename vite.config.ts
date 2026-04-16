@@ -6,8 +6,13 @@ export default defineConfig({
   plugins: [react(), tailwindcss()],
   server: {
     port: 5000,
-    strictPort: true,
+    strictPort: false,
     open: true,
+    host: '0.0.0.0',
+    headers: {
+      'X-Frame-Options': 'ALLOWALL',
+    },
+    allowedHosts: ['all'],
   },
   resolve: {
     alias: {
