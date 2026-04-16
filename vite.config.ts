@@ -12,7 +12,7 @@ export default defineConfig({
     headers: {
       'X-Frame-Options': 'ALLOWALL',
     },
-    allowedHosts: ['all'],
+    allowedHosts: true,
   },
   resolve: {
     alias: {
