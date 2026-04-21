@@ -775,10 +775,10 @@ export const siteContent = {
       value: "07.555.086/0001-68",
     },
     impact_breakdown: [
-      { amount: "R$ 50", result: "1 sessão de fisioterapia para uma criança em reabilitação" },
-      { amount: "R$ 150", result: "Uma semana de acompanhamento psicológico familiar" },
-      { amount: "R$ 500", result: "Kit completo de avaliação multidisciplinar" },
-      { amount: "R$ 1.000", result: "Um mês de programa integral para uma família" },
+      { result: "Contribui para a melhoria dos espaços de acolhimento e convivência" },
+      { result: "Ajuda na ampliação de ambientes acessíveis para a comunidade" },
+      { result: "Apoia a aquisição de materiais e recursos para novos projetos" },
+      { result: "Fortalece a expansão do CVI para alcançar mais pessoas no Amazonas" },
     ],
   },
 

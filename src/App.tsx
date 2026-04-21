@@ -3,9 +3,15 @@ import { Routes, Route, useLocation } from "react-router-dom";
 import { Home } from "@/pages/Home";
 import { CookieConsent } from "@/components/layout/CookieConsent";
 import { SplashLoader } from "@/components/layout/SplashLoader";
+import { AdminLogin } from "@/pages/admin/Login";
+import { Dashboard } from "@/pages/admin/Dashboard";
+import { DashboardHome } from "@/pages/admin/DashboardHome";
+import { Ponto } from "@/pages/admin/Ponto";
+import { Employees } from "@/pages/admin/Employees";
+import { Adjustments } from "@/pages/admin/Adjustments";
+import { Timesheet } from "@/pages/admin/Timesheet";
 
-// Lazy-loaded routes — só carregam quando o usuário navega pra elas
-// Reduz o bundle inicial de ~590KB pra ~350KB
+// Lazy-loaded routes
 const Servicos = lazy(() =>
   import("@/pages/Servicos").then((m) => ({ default: m.Servicos }))
 );
@@ -53,11 +59,23 @@ function App() {
       {showSplash && <SplashLoader />}
       <Suspense fallback={<PageLoader />}>
         <Routes>
+          {/* Site institucional */}
           <Route path="/" element={<Home />} />
           <Route path="/servicos" element={<Servicos />} />
           <Route path="/galeria" element={<Galeria />} />
           <Route path="/privacidade" element={<Privacidade />} />
           <Route path="/brandbook" element={<Brandbook />} />
+
+          {/* Área administrativa */}
+          <Route path="/admin" element={<AdminLogin />} />
+          <Route path="/admin/dashboard" element={<Dashboard />}>
+            <Route index element={<DashboardHome />} />
+            <Route path="rh/ponto" element={<Ponto />} />
+            <Route path="rh/funcionarios" element={<Employees />} />
+            <Route path="rh/ajustes" element={<Adjustments />} />
+            <Route path="rh/espelho" element={<Timesheet />} />
+          </Route>
+
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Suspense>

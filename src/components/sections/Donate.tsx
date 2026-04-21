@@ -52,16 +52,14 @@ export function Donate() {
             <ul role="list" className="divide-y divide-neutral-200 border-y border-neutral-200">
               {donate.impact_breakdown.map((item, i) => (
                 <motion.li
-                  key={item.amount}
+                  key={item.result}
                   initial={{ opacity: 0, x: -10 }}
                   whileInView={{ opacity: 1, x: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: i * 0.08 }}
-                  className="grid grid-cols-[auto_1fr] sm:grid-cols-[140px_1fr] items-baseline gap-4 py-5"
+                  className="flex items-start gap-3 py-4"
                 >
-                  <span className="text-2xl sm:text-3xl font-bold text-secondary-600 tabular-nums">
-                    {item.amount}
-                  </span>
+                  <span aria-hidden="true" className="mt-2 h-2 w-2 rounded-full bg-secondary-500 shrink-0" />
                   <span className="text-base sm:text-lg text-neutral-800 leading-snug">{item.result}</span>
                 </motion.li>
               ))}

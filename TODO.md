@@ -52,6 +52,23 @@
 - [ ] Vídeos institucionais com legendas + transcrição (WebVTT)
 - [ ] Área do paciente (login + agendamento)
 
+## 🏢 Painel Administrativo — Próximas Etapas
+
+### Dashboard por departamento
+- [ ] **Dashboard do RH** — o Painel atual será transformado no dashboard específico do RH, com métricas de ponto, banco de horas, resumo mensal, alertas de ajustes pendentes
+- [ ] **Dashboard geral** — visão consolidada de todos os departamentos (só admin)
+
+### Novos departamentos (sidebar já preparada)
+- [ ] **Financeiro** — rota `/admin/dashboard/financeiro/*`
+- [ ] **Exames** — rota `/admin/dashboard/exames/*`
+- [ ] Cada departamento terá seu responsável e dashboard próprio
+
+### Controle de acesso por nível
+- [ ] Criar sistema de permissões granulares (não só admin/gestor/funcionario)
+- [ ] Cada gestor gerencia apenas seu departamento (ex: Enéas → RH, outro → Financeiro)
+- [ ] Funcionário vê apenas as funções do departamento ao qual pertence
+- [ ] Painel de gestão de permissões para o admin
+
 ## 🔍 SEO & Analytics
 
 - [ ] Configurar Google Analytics 4 / Tag Manager (respeitar consentimento LGPD)
