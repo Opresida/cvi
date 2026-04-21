@@ -1,34 +1,54 @@
 # CVI Amazonas — Centro de Vida Independente
 
-Site institucional moderno do **CVI - Centro de Vida Independente do Amazonas** — um centro de reabilitação biopsicossocial que atende pessoas com deficiência há mais de 20 anos, oferecendo atendimento 100% gratuito, financiado pelo SUS.
+Site institucional + sistema administrativo do **CVI - Centro de Vida Independente do Amazonas** — centro de reabilitação biopsicossocial reconhecido como **CER III** pelo Ministério da Saúde, com atendimento 100% gratuito financiado pelo SUS.
 
-Construído com foco em **identidade editorial, performance e acessibilidade premium (WCAG 2.1 AA)**, alinhado à missão institucional de promover autonomia e inclusão para pessoas com deficiência.
+Construído com foco em **identidade editorial, performance, acessibilidade premium (WCAG 2.1 AA)** e **gestão interna de RH** com sistema de ponto eletrônico.
 
 ---
 
 ## ✨ Highlights
 
-- 🎨 **Design editorial** — sem cards genéricos: timeline horizontal, infográficos, diagrama circular SVG, carrossel acessível, tipografia revista
-- ♿ **Acessibilidade Premium** — toolbar com VLibras (oficial gov.br), alto contraste, ajuste de fonte, pausar animações, sublinhar links — preferências persistidas em `localStorage`
-- 💚 **CTAs flutuantes** — WhatsApp (bottom-left) + Doação (bottom-right) sempre visíveis
-- 🔍 **Schema.org** — `MedicalOrganization + NGO` para SEO especializado em saúde
-- 🎯 **WCAG 2.1 AA** — skip links, landmarks ARIA, `prefers-reduced-motion`, focus visível 3px, contrastes elevados
-- ⚡ **Performance** — bundle 125KB gzip, fonte preconnect, lazy loading, animações GPU-accelerated
+**Site Institucional:**
+- 🎨 Design editorial — timeline, infográficos, diagrama SVG, carrossel acessível
+- ♿ Toolbar de acessibilidade com VLibras (gov.br), alto contraste, ajuste de fonte
+- 🔒 LGPD completo — banner de cookies + política de privacidade + preferências
+- 📖 Brandbook interativo com gerador de assinatura de e-mail
+- 📸 Galeria com 5 pastas, lightbox acessível e 45+ fotos
+- 💚 CTAs flutuantes — WhatsApp + Doação sempre visíveis
+
+**Painel Administrativo:**
+- 🏢 Sidebar colapsável por departamento (RH, futuros: Financeiro, Exames)
+- ⏰ Sistema de ponto com geofencing GPS (raio 100m da sede)
+- 👥 CRUD de funcionários (CLT/PJ, jornada configurável, ativar/desativar)
+- 📋 Workflow de ajustes (solicitar → aprovar/rejeitar)
+- 📄 Espelho de ponto mensal com impressão
+- 🔐 Auth JWT com blacklist, rate limiting, sanitização XSS
+- ✅ 84 testes automatizados (62 API + 22 frontend) — 100% aprovados
+- 🛡️ Pentest com 30 vetores (SQLi, XSS, JWT, IDOR, CORS, DoS) — 0 vulnerabilidades
 
 ---
 
 ## 🛠 Tech Stack
 
-| Tecnologia | Versão | Propósito |
-|---|---|---|
-| **React** | 19.x | UI Library |
-| **TypeScript** | 5.x | Tipagem estática |
-| **Vite** | 8.x | Build tool + dev server |
-| **Tailwind CSS** | 4.x | Design system + estilização (via `@theme`) |
-| **Framer Motion** | 12.x | Animações e transições |
-| **Lucide React** | — | Ícones SVG |
-| **qrcode.react** | — | QR Code Pix dinâmico |
-| **VLibras** | gov.br | Tradutor oficial de Libras |
+### Frontend
+| Tecnologia | Propósito |
+|---|---|
+| **React 19** + **TypeScript 5** | UI Library + tipagem |
+| **Vite 8** | Build tool + dev server + HMR |
+| **Tailwind CSS 4** | Design system via `@theme` tokens |
+| **Framer Motion 12** | Animações (respeita `prefers-reduced-motion`) |
+| **React Router 7** | Multi-page + admin routes |
+| **Lucide React** | Ícones SVG |
+| **qrcode.react** | QR Code Pix dinâmico |
+
+### Backend
+| Tecnologia | Propósito |
+|---|---|
+| **Express 5** | API REST |
+| **Drizzle ORM** | ORM type-safe (queries parametrizadas, zero SQLi) |
+| **PostgreSQL** via **Neon** | Banco serverless |
+| **JWT** + **bcrypt** | Autenticação e hashing de senhas |
+| **express-rate-limit** | Proteção contra brute force e DoS |
 
 ---
 
@@ -37,34 +57,83 @@ Construído com foco em **identidade editorial, performance e acessibilidade pre
 ### Pré-requisitos
 - **Node.js** >= 18.0.0
 - **npm** >= 9.0.0
+- Conta no **[Neon](https://neon.tech)** (PostgreSQL serverless gratuito)
 
 ### Setup
+
 ```bash
 git clone https://github.com/Opresida/cvi.git
 cd cvi
+
+# Instalar dependências
 npm install
-npm run dev
+
+# Configurar variáveis de ambiente
+cp .env.example .env
+# Editar .env com DATABASE_URL do Neon + JWT_SECRET
+
+# Criar tabelas no banco
+npm run db:push
+
+# Criar usuário admin
+npm run db:seed
+
+# Iniciar frontend (porta 5000) + backend (porta 3001)
+npm run dev          # frontend
+npm run dev:server   # backend (em outro terminal)
 ```
 
-O app abre automaticamente em **http://localhost:5000**
+### Variáveis de ambiente (.env)
 
-### Rotas disponíveis
+```env
+DATABASE_URL=postgresql://user:pass@ep-xxx.neon.tech/neondb?sslmode=require
+JWT_SECRET=sua_chave_secreta_aqui
+PORT=3001
+FRONTEND_URL=http://localhost:5000
+```
+
+---
+
+## 📁 Rotas
+
+### Site Institucional
 
 | Rota | Página |
 |---|---|
-| `/` | Home (single-page com 10 seções) |
-| `/servicos` | Catálogo completo de serviços (especialidades, projetos, patologias, modalidades, entrada, elegibilidade, alta) |
-| `/galeria` | Galeria com 5 pastas e lightbox acessível |
+| `/` | Home — 10 seções editoriais |
+| `/servicos` | Catálogo completo (especialidades, projetos, modalidades, elegibilidade) |
+| `/galeria` | 5 pastas de fotos com lightbox acessível |
 | `/privacidade` | Política de Privacidade e Cookies (LGPD) |
-| `/brandbook` | Brandbook & UI System + gerador de assinatura de e-mail |
+| `/brandbook` | Design system + gerador de assinatura de e-mail |
 
-### Scripts
-| Comando | Descrição |
-|---|---|
-| `npm run dev` | Dev server na porta 5000 (com HMR) |
-| `npm run build` | Build de produção em `dist/` |
-| `npm run preview` | Preview do build de produção |
-| `npm run lint` | Executa o linter (ESLint) |
+### Painel Administrativo
+
+| Rota | Acesso | Página |
+|---|---|---|
+| `/admin` | Público | Login |
+| `/admin/dashboard` | Auth | Painel com métricas reais |
+| `/admin/dashboard/rh/ponto` | Auth | Registro de ponto (relógio + GPS) |
+| `/admin/dashboard/rh/funcionarios` | Admin/Gestor | CRUD de funcionários |
+| `/admin/dashboard/rh/ajustes` | Auth | Solicitar/aprovar ajustes de ponto |
+| `/admin/dashboard/rh/espelho` | Auth | Espelho de ponto mensal |
+
+### API (Backend)
+
+| Método | Rota | Descrição |
+|---|---|---|
+| POST | `/api/auth/login` | Login (JWT 8h) |
+| POST | `/api/auth/logout` | Logout (blacklist token) |
+| GET | `/api/auth/me` | Dados do usuário logado |
+| GET/POST/PUT/DELETE | `/api/employees` | CRUD de funcionários (admin) |
+| POST | `/api/ponto/registrar` | Registrar ponto (GPS + geofencing) |
+| GET | `/api/ponto/hoje` | Registros do dia |
+| GET | `/api/ponto/historico` | Histórico (filtro por dias) |
+| GET | `/api/ponto/espelho` | Espelho mensal |
+| GET | `/api/ponto/todos` | Todos os registros (admin) |
+| POST | `/api/adjustments` | Solicitar ajuste |
+| GET | `/api/adjustments/mine` | Minhas solicitações |
+| GET | `/api/adjustments/pending` | Pendentes de aprovação (admin) |
+| PUT | `/api/adjustments/:id/review` | Aprovar/rejeitar ajuste |
 
 ---
 
@@ -72,161 +141,133 @@ O app abre automaticamente em **http://localhost:5000**
 
 ```
 cvi/
-├── public/                       # Assets estáticos servidos como-estão
-│   └── favicon.png
-├── src/
-│   ├── assets/
-│   │   └── images/               # Logos, fotos, imagem hero
-│   │       ├── logo.png          # Versão colorida (Header)
-│   │       ├── logo-white.png    # Versão branca (Footer)
-│   │       ├── hero-transition.jpeg  # Showcase entre Hero e About
-│   │       ├── team-photo.jpg
-│   │       └── favicon.png
+├── server/                        # Backend (Express + Drizzle)
+│   ├── db/
+│   │   ├── index.ts               # Conexão Neon serverless
+│   │   └── schema.ts              # Tabelas: users, punchRecords, adjustments, settings
+│   ├── routes/
+│   │   ├── auth.ts                # Login/logout/me
+│   │   ├── ponto.ts               # Registro + geofencing + espelho
+│   │   ├── employees.ts           # CRUD funcionários
+│   │   └── adjustments.ts         # Workflow de ajustes
+│   ├── middleware/
+│   │   └── auth.ts                # JWT verify + blacklist + roles
+│   ├── utils/
+│   │   ├── geofence.ts            # Haversine distance calculation
+│   │   ├── sanitize.ts            # XSS prevention (HTML escape)
+│   │   └── tokenBlacklist.ts      # JWT invalidation pós-logout
+│   ├── index.ts                   # Express server + rate limiting
+│   └── seed.ts                    # Admin user + system settings
+│
+├── src/                           # Frontend (React + TypeScript)
 │   ├── components/
-│   │   ├── layout/               # Estrutura global
-│   │   │   ├── Header.tsx              # Nav fixa + scrollspy + mobile menu
-│   │   │   ├── Footer.tsx              # Selos, parceiros, links legais
-│   │   │   ├── SkipLinks.tsx           # Pular para conteúdo/nav
-│   │   │   ├── AccessibilityToolbar.tsx # Toolbar WCAG + VLibras + cookies
-│   │   │   ├── CookieConsent.tsx       # Banner LGPD + modal de preferências
-│   │   │   ├── FloatingDonateCTA.tsx   # Botão flutuante de doação
-│   │   │   └── FloatingWhatsApp.tsx    # Botão flutuante WhatsApp
-│   │   ├── sections/             # Seções da home single-page
-│   │   │   ├── Hero.tsx                # 00 — Headline + ondas SVG
-│   │   │   ├── Showcase.tsx            # Imagem com orbital animada
-│   │   │   ├── About.tsx               # 01 — Manifesto + timeline + valores (inclui CER III)
-│   │   │   ├── Impact.tsx              # 02 — Escada de autonomia (números)
-│   │   │   ├── Services.tsx            # 03 — Diagrama circular + CTA p/ página completa
-│   │   │   ├── Pillars.tsx             # 04 — 5 pilares editoriais
-│   │   │   ├── Team.tsx                # 05 — Equipe + especialidades
-│   │   │   ├── Testimonials.tsx        # 06 — Carrossel acessível
-│   │   │   ├── Faq.tsx                 # 07 — Accordion de dúvidas frequentes
-│   │   │   ├── Galeria.tsx             # 08 — Preview das 5 pastas + CTA
-│   │   │   ├── Donate.tsx              # 09 — Breakdown + QR Code Pix
-│   │   │   └── Contact.tsx             # 10 — Tipografia + mapa + form
-│   │   └── ui/                   # Componentes reutilizáveis
-│   │       ├── Button.tsx
-│   │       └── SectionLabel.tsx
-│   ├── pages/                    # Rotas
-│   │   ├── Home.tsx                    # Composição das seções da home
-│   │   ├── Servicos.tsx                # Catálogo completo (7 blocos editoriais)
-│   │   ├── Galeria.tsx                 # Abas por pasta + lightbox + CTA final
-│   │   ├── Privacidade.tsx             # Política LGPD (10 seções)
-│   │   └── Brandbook.tsx               # Brandbook + gerador de assinatura de e-mail
-│   ├── data/
-│   │   └── content.ts            # Toda copy + dados estáticos (nav, home, servicesPage, gallery, faq)
-│   ├── hooks/
-│   │   ├── useCountUp.ts                # Contador animado em scroll
-│   │   ├── useScrollspy.ts              # Highlight nav ativa
-│   │   ├── useReducedMotion.ts          # Detecta preferência do SO
-│   │   ├── useAccessibilitySettings.ts  # Toolbar (localStorage)
-│   │   └── useCookieConsent.ts          # Consentimento LGPD (localStorage versionado)
-│   ├── App.tsx                   # BrowserRouter + Routes + CookieConsent global
-│   ├── main.tsx                  # Bootstrap React
-│   └── index.css                 # Design tokens + Tailwind + a11y CSS
-├── index.html                    # Schema.org + meta tags + fontes
-├── ARCHITECTURE.md               # Fluxo de dados e responsabilidades
-├── CONTEXT.md                    # Regras de negócio e decisões
-├── TODO.md                       # Tarefas e melhorias futuras
-└── README.md                     # Este arquivo
+│   │   ├── layout/                # Header, Footer, SkipLinks, Toolbar, Cookies, WhatsApp, Donate
+│   │   ├── sections/              # 10 seções da home (Hero → Contact)
+│   │   └── ui/                    # Button, SectionLabel
+│   ├── pages/
+│   │   ├── Home.tsx               # Composição das seções
+│   │   ├── Servicos.tsx           # Catálogo completo
+│   │   ├── Galeria.tsx            # Galeria com lightbox
+│   │   ├── Privacidade.tsx        # Política LGPD
+│   │   ├── Brandbook.tsx          # Design system
+│   │   └── admin/                 # Painel administrativo
+│   │       ├── Login.tsx
+│   │       ├── Dashboard.tsx      # Sidebar colapsável por departamento
+│   │       ├── DashboardHome.tsx   # Métricas reais do banco
+│   │       ├── Ponto.tsx          # Relógio + GPS + geofencing
+│   │       ├── Employees.tsx      # CRUD com modal + CLT/PJ
+│   │       ├── Adjustments.tsx    # Solicitar + aprovar/rejeitar
+│   │       └── Timesheet.tsx      # Espelho mensal + impressão
+│   ├── data/content.ts            # Copy centralizada
+│   ├── hooks/                     # useCountUp, useScrollspy, useReducedMotion, etc.
+│   ├── App.tsx                    # Routes (lazy loading) + CookieConsent
+│   └── index.css                  # Design tokens + Tailwind + a11y CSS
+│
+├── .env.example                   # Template de variáveis
+├── drizzle.config.ts              # Config do Drizzle (Neon)
+├── netlify.toml                   # Deploy config (SPA fallback, headers, cache)
+├── ARCHITECTURE.md                # Fluxo de dados e responsabilidades
+├── CONTEXT.md                     # Regras de negócio e decisões
+└── TODO.md                        # Roadmap e pendências
 ```
 
 ---
 
-## 🎨 Design System
+## 🔒 Segurança
 
-### Paleta de Cores
+### Proteções implementadas
 
-| Token | Hex | Uso |
-|---|---|---|
-| `primary-700` | `#0a7688` | Teal escuro — header, CTAs, headings de destaque |
-| `primary-500` | `#0fa8bd` | Teal médio — links, foco, accent primário |
-| `primary-50` | `#e6f7f9` | Teal claro — backgrounds suaves |
-| `secondary-500` | `#d43d48` | Coral — CTA de doação, calor humano |
-| `accent-500` | `#10b981` | Verde — esperança, vida, sucesso |
-| `warm-500` | `#f59e0b` | Dourado — excelência (uso pontual) |
-| `neutral-900` | `#0f172a` | Texto principal |
-| `neutral-700` | `#334155` | Corpo de texto (contraste WCAG AA+) |
-
-### Tipografia
-- **Headings**: Plus Jakarta Sans (700, 800) — tracking-tight `-0.02em`
-- **Body**: Inter (400, 500, 600) — line-height 1.7
-
-### Sombras
-- `shadow-soft` — header scrolled
-- `shadow-card` — elementos elevados ao hover
-- `shadow-elevated` — modais, CTAs flutuantes
-
----
-
-## ♿ Plano de Inclusão (WCAG 2.1 AA)
-
-### Toolbar de Acessibilidade
-Botão sticky lateral esquerda (top-28). Recursos:
-- **Tamanho da fonte** — 3 níveis (16px / 18px / 20px)
-- **Alto contraste** — paleta preto/amarelo/branco
-- **Pausar animações** — toggle independente do `prefers-reduced-motion` do SO
-- **Sublinhar links** — destaca todos os links da página
-- **VLibras** — widget oficial do gov.br (carregado sob demanda)
-- **Restaurar padrões** — reset com 1 clique
-- Preferências salvas em `localStorage`, fechamento via `ESC`
-
-### Outros recursos
-- ✅ Skip Links (primeiro Tab) → conteúdo / navegação
-- ✅ Landmarks ARIA (`banner`, `main`, `contentinfo`, `navigation`)
-- ✅ `aria-current="location"` no link da seção ativa
-- ✅ `aria-live` em notificações dinâmicas (Pix copiado, form enviado)
-- ✅ `aria-expanded` / `aria-controls` em disclosures, FAQ e menu mobile
-- ✅ Lightbox da galeria navegável por `←` / `→` / `ESC`
-- ✅ Carrossel de testimoniais navegável por `←` / `→`
-- ✅ Foco visível 3px `primary-500` + offset 3px
-- ✅ Ícones decorativos com `aria-hidden="true"`
-- ✅ E-mail / telefone / website como `<a>` clicáveis (`mailto:`, `tel:`)
-- ✅ Formulário com `<label>`, `aria-required`, status `aria-live`
-- ✅ Texto alternativo em todas imagens; molduras decorativas com `aria-hidden`
-- ✅ `prefers-reduced-motion` global respeitado em CSS + Framer Motion
-- ✅ Banner de cookies LGPD com focus trap + ESC + sincronização entre abas
-
----
-
-## 🌊 Identidade Visual
-
-Para fugir do "site genérico de IA", o redesign substituiu **31 cards idênticos** por componentes editoriais únicos:
-
-| Seção | Padrão visual |
+| Vetor | Proteção |
 |---|---|
-| **Hero** | Fundo sólido editorial + ondas SVG (Rio Amazonas) + headline com palavra-destaque |
-| **Showcase** | Imagem com **borda orbital animada** (conic gradient girando) + molduras geométricas + gleam no hover |
-| **About** | Bloco manifesto tipográfico + timeline horizontal de marcos + valores integrados |
-| **Impact** | **Escada ascendente** de autonomia — números crescem com indentação progressiva |
-| **Services** | **Diagrama circular SVG** interativo (Pessoa Atendida no centro) + accordion |
-| **Pillars** | Tipografia revista — número 9xl como fundo decorativo |
-| **Team** | Foto com molduras geométricas + lista numerada de especialidades |
-| **Testimonials** | Carrossel tela cheia + tipografia 4xl + indicadores de progresso |
-| **Donate** | Breakdown de impacto ("R$50 = 1 sessão") + QR Code Pix dinâmico |
-| **Contact** | Hierarquia tipográfica + Google Maps + formulário acessível |
+| **SQL Injection** | Drizzle ORM (queries 100% parametrizadas) |
+| **XSS** | `sanitizeHtml()` em todos os inputs texto (name, reason, notes) |
+| **JWT Forjado** | Verificação com secret obrigatório (sem fallback) |
+| **Token Replay** | Blacklist em memória após logout |
+| **Brute Force** | Rate limiting: 10 login/15min, 10 ponto/min, 200 global/15min |
+| **IDOR** | Autorização por role em todas as rotas admin |
+| **Race Condition** | Anti-duplo ponto (60s) + anti-dupla aprovação (status check) |
+| **GPS Spoofing** | Validação regex + bounds check (-90/90, -180/180) |
+| **Privilege Escalation** | Middlewares separados: `adminOnly` vs `gestorOrAdmin` |
+| **Info Disclosure** | Error IDs (UUID) sem stack traces em produção |
+
+### Testes realizados
+- **62 testes de API** — auth, CRUD, ponto, ajustes, segurança
+- **22 testes de frontend** — rotas, meta tags, SPA fallback, build
+- **30 vetores de pentest** — SQLi, XSS, JWT manipulation, IDOR, CORS, DoS
+- **100% de aprovação** em todas as baterias
+
+---
+
+## ♿ Acessibilidade (WCAG 2.1 AA)
+
+- Toolbar com VLibras, alto contraste, ajuste de fonte, pausar animações
+- Skip Links, landmarks ARIA, foco visível 3px
+- Carrossel e lightbox navegáveis por teclado
+- `prefers-reduced-motion` respeitado globalmente
+- Formulários com `<label>`, `aria-required`, `aria-live`
+- Banner de cookies LGPD acessível
+
+---
+
+## 🏢 Sistema de Ponto — Regras de Negócio
+
+| Regra | Valor |
+|---|---|
+| Tolerância | 10 minutos (CLT art. 58 §1º) |
+| Intervalo | 1h almoço |
+| Banco de horas | 12 meses de compensação |
+| Horas extras | 50% seg-sex, 75% sáb/dom/feriado |
+| Geofencing | GPS, raio 100m da sede |
+| Fechamento mensal | Dia 20 |
+| Espelho de ponto | Gerado para RH + funcionário |
+| Sede | R. Acari, 50 - Conj. Atílio Andreazza, Manaus-AM |
+
+---
+
+## Scripts
+
+| Comando | Descrição |
+|---|---|
+| `npm run dev` | Frontend (porta 5000, HMR) |
+| `npm run dev:server` | Backend (porta 3001, watch) |
+| `npm run build` | Build de produção |
+| `npm run server` | Backend produção |
+| `npm run db:push` | Sincronizar schema no Neon |
+| `npm run db:seed` | Criar admin + configurações |
+| `npm run db:studio` | Drizzle Studio (explorar banco) |
+| `npm run lint` | ESLint |
 
 ---
 
 ## 📦 Deploy
 
-```bash
-npm run build
-```
+**Netlify** (site institucional):
+- Configurado via `netlify.toml` — auto-deploy a cada push
+- SPA fallback, security headers, cache otimizado
 
-Saída em `dist/` — bundle gzip ~125KB. Compatível com:
-- **Vercel** / **Netlify** (zero config)
-- **AWS S3 + CloudFront**
-- **GitHub Pages** (com base path)
-- Qualquer hosting estático
-
----
-
-## 📝 Documentação Adicional
-
-- 📐 **[ARCHITECTURE.md](./ARCHITECTURE.md)** — Diagrama de fluxo de dados, responsabilidades por componente
-- 🎯 **[CONTEXT.md](./CONTEXT.md)** — Regras de negócio, decisões arquiteturais, padrões de código
-- ✅ **[TODO.md](./TODO.md)** — Tarefas pendentes, melhorias futuras, bugs conhecidos
+**Replit** (backend + admin):
+- Adicionar `DATABASE_URL`, `JWT_SECRET`, `FRONTEND_URL` nos Secrets
+- Rodar `npm run db:push` + `npm run db:seed`
 
 ---
 
@@ -234,8 +275,9 @@ Saída em `dist/` — bundle gzip ~125KB. Compatível com:
 
 - **Nome**: CVI - Centro de Vida Independente do Amazonas
 - **CNPJ**: 07.555.086/0001-68
+- **Reconhecimento**: CER III (Física, Intelectual e Auditiva) — Ministério da Saúde
 - **Localização**: Manaus, Amazonas - Brasil
-- **Atuação**: 20+ anos, 50+ municípios atendidos
+- **Contato**: cvi.amazonas@gmail.com | (92) 99116-3746 | @cvi.am
 - **Financiamento**: 100% público (SUS / Fundo Nacional de Saúde)
 - **Termos de Cooperação**: 001/2021 e 001/2024 — SES/AM
 
@@ -243,6 +285,4 @@ Saída em `dist/` — bundle gzip ~125KB. Compatível com:
 
 ## 📄 Licença
 
-Projeto privado — CVI - Centro de Vida Independente do Amazonas.
-
-Todos os direitos reservados. Conteúdo institucional protegido.
+Projeto privado — CVI - Centro de Vida Independente do Amazonas. Todos os direitos reservados.
