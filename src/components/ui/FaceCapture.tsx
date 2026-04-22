@@ -250,8 +250,8 @@ export function FaceCapture({ mode, userId, onVerified, onError }: FaceCapturePr
             className="flex flex-col items-center gap-3 p-6 bg-neutral-50 hover:bg-primary-50 border-2 border-neutral-200 hover:border-primary-300 rounded-2xl transition-colors"
           >
             <Camera size={32} className="text-primary-700" />
-            <span className="font-semibold text-neutral-900">Câmera do Computador</span>
-            <span className="text-xs text-neutral-500">Usar webcam diretamente</span>
+            <span className="font-semibold text-neutral-900 text-center">Usar câmera agora</span>
+            <span className="text-xs text-neutral-500 text-center">Do computador ou do próprio celular</span>
           </button>
           <button
             type="button"
@@ -259,8 +259,8 @@ export function FaceCapture({ mode, userId, onVerified, onError }: FaceCapturePr
             className="flex flex-col items-center gap-3 p-6 bg-neutral-50 hover:bg-primary-50 border-2 border-neutral-200 hover:border-primary-300 rounded-2xl transition-colors"
           >
             <Smartphone size={32} className="text-primary-700" />
-            <span className="font-semibold text-neutral-900">QR Code pelo Celular</span>
-            <span className="text-xs text-neutral-500">Sem webcam? Use o celular</span>
+            <span className="font-semibold text-neutral-900 text-center">QR Code em outro celular</span>
+            <span className="text-xs text-neutral-500 text-center">Se a câmera não estiver disponível aqui</span>
           </button>
         </div>
         {status === "error" && (

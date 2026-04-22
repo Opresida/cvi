@@ -12,8 +12,13 @@ import {
   FileText,
   ClipboardCheck,
   Building2,
+  KeyRound,
+  Save,
+  AlertCircle,
+  Check,
 } from "lucide-react";
 import logoImg from "@/assets/images/logo-white.png";
+import { PasswordInput } from "@/components/ui/PasswordInput";
 
 const API_URL = "";
 
@@ -24,6 +29,7 @@ interface UserData {
   role: string;
   department: string | null;
   position: string | null;
+  hasLunchBreak?: boolean;
 }
 
 type NavItem = {
@@ -189,6 +195,55 @@ export function Dashboard() {
   const [user, setUser] = useState<UserData | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const [passwordModalOpen, setPasswordModalOpen] = useState(false);
+  const [pwdForm, setPwdForm] = useState({ current: "", next: "", confirm: "" });
+  const [pwdLoading, setPwdLoading] = useState(false);
+  const [pwdMsg, setPwdMsg] = useState<{ type: "success" | "error"; text: string } | null>(null);
+
+  const handleChangePassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setPwdMsg(null);
+
+    if (pwdForm.next !== pwdForm.confirm) {
+      setPwdMsg({ type: "error", text: "A nova senha e a confirmação não coincidem" });
+      return;
+    }
+    if (pwdForm.next.length < 8) {
+      setPwdMsg({ type: "error", text: "A nova senha deve ter pelo menos 8 caracteres" });
+      return;
+    }
+
+    setPwdLoading(true);
+    try {
+      const res = await fetch(`${API_URL}/api/auth/change-password`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("cvi-token") || ""}`,
+        },
+        credentials: "include",
+        body: JSON.stringify({
+          currentPassword: pwdForm.current,
+          newPassword: pwdForm.next,
+        }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setPwdMsg({ type: "success", text: data.message || "Senha alterada — refazendo login..." });
+        setTimeout(() => {
+          localStorage.removeItem("cvi-token");
+          localStorage.removeItem("cvi-user");
+          navigate("/admin");
+        }, 1800);
+      } else {
+        setPwdMsg({ type: "error", text: data.error || "Erro ao alterar senha" });
+      }
+    } catch {
+      setPwdMsg({ type: "error", text: "Erro de conexão com o servidor" });
+    } finally {
+      setPwdLoading(false);
+    }
+  };
 
   useEffect(() => {
     const stored = localStorage.getItem("cvi-user");
@@ -277,7 +332,7 @@ export function Dashboard() {
       </aside>
 
       {/* Main content */}
-      <div className="flex-1 lg:pl-64">
+      <div className="flex-1 min-w-0 lg:pl-64 overflow-x-hidden">
         <header className="sticky top-0 z-20 bg-white border-b border-neutral-200 px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <button
@@ -323,6 +378,19 @@ export function Dashboard() {
                     </div>
                     <button
                       type="button"
+                      onClick={() => {
+                        setUserMenuOpen(false);
+                        setPasswordModalOpen(true);
+                        setPwdForm({ current: "", next: "", confirm: "" });
+                        setPwdMsg(null);
+                      }}
+                      className="w-full flex items-center gap-2 px-4 py-3 text-sm text-neutral-700 hover:bg-neutral-50 transition-colors border-b border-neutral-100"
+                    >
+                      <KeyRound size={16} aria-hidden="true" />
+                      Alterar senha
+                    </button>
+                    <button
+                      type="button"
                       onClick={handleLogout}
                       className="w-full flex items-center gap-2 px-4 py-3 text-sm text-neutral-700 hover:bg-neutral-50 transition-colors"
                     >
@@ -340,6 +408,70 @@ export function Dashboard() {
           <Outlet context={{ user }} />
         </main>
       </div>
+
+      {/* Modal — Alterar senha */}
+      {passwordModalOpen && (
+        <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4"
+          onClick={() => !pwdLoading && setPasswordModalOpen(false)}>
+          <div className="bg-white rounded-2xl shadow-elevated w-full max-w-md p-5 sm:p-6" onClick={e => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-5">
+              <h3 className="text-lg font-bold text-neutral-900 flex items-center gap-2">
+                <KeyRound size={20} className="text-primary-700" />
+                Alterar senha
+              </h3>
+              <button type="button" disabled={pwdLoading} onClick={() => setPasswordModalOpen(false)}
+                className="p-1.5 rounded-lg hover:bg-neutral-100 disabled:opacity-50">
+                <X size={20} />
+              </button>
+            </div>
+
+            <form onSubmit={handleChangePassword} className="space-y-4">
+              <div>
+                <label className="block text-sm font-semibold text-neutral-800 mb-1">Senha atual</label>
+                <PasswordInput required autoFocus autoComplete="current-password"
+                  value={pwdForm.current} onChange={e => setPwdForm({...pwdForm, current: e.target.value})}
+                  className="w-full px-4 py-2.5 rounded-xl border border-neutral-300 focus:border-primary-500 focus:ring-2 focus:ring-primary-200 outline-none" />
+              </div>
+              <div>
+                <label className="block text-sm font-semibold text-neutral-800 mb-1">Nova senha</label>
+                <PasswordInput required minLength={8} autoComplete="new-password"
+                  value={pwdForm.next} onChange={e => setPwdForm({...pwdForm, next: e.target.value})}
+                  className="w-full px-4 py-2.5 rounded-xl border border-neutral-300 focus:border-primary-500 focus:ring-2 focus:ring-primary-200 outline-none" />
+                <p className="text-xs text-neutral-400 mt-1">Mínimo 8 caracteres</p>
+              </div>
+              <div>
+                <label className="block text-sm font-semibold text-neutral-800 mb-1">Confirmar nova senha</label>
+                <PasswordInput required autoComplete="new-password"
+                  value={pwdForm.confirm} onChange={e => setPwdForm({...pwdForm, confirm: e.target.value})}
+                  className="w-full px-4 py-2.5 rounded-xl border border-neutral-300 focus:border-primary-500 focus:ring-2 focus:ring-primary-200 outline-none" />
+              </div>
+
+              {pwdMsg && (
+                <div role="status" aria-live="polite"
+                  className={`flex items-start gap-2 px-3 py-2.5 rounded-xl text-sm font-medium ${
+                    pwdMsg.type === "success"
+                      ? "bg-accent-50 border border-accent-200 text-accent-700"
+                      : "bg-secondary-50 border border-secondary-200 text-secondary-700"
+                  }`}>
+                  {pwdMsg.type === "success" ? <Check size={16} className="shrink-0 mt-0.5" /> : <AlertCircle size={16} className="shrink-0 mt-0.5" />}
+                  <span>{pwdMsg.text}</span>
+                </div>
+              )}
+
+              <div className="flex justify-end gap-3 pt-2 border-t border-neutral-100">
+                <button type="button" disabled={pwdLoading} onClick={() => setPasswordModalOpen(false)}
+                  className="px-4 py-2.5 rounded-xl text-sm text-neutral-700 hover:bg-neutral-100 font-medium disabled:opacity-50">
+                  Cancelar
+                </button>
+                <button type="submit" disabled={pwdLoading}
+                  className="inline-flex items-center gap-2 bg-primary-700 hover:bg-primary-800 text-white text-sm font-semibold px-5 py-2.5 rounded-xl disabled:opacity-50">
+                  <Save size={16} /> {pwdLoading ? "Salvando..." : "Alterar senha"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

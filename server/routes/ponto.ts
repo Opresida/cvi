@@ -56,6 +56,12 @@ router.post("/registrar", async (req: AuthRequest, res) => {
       return res.status(400).json({ error: "Seu perfil não requer registro de ponto" });
     }
 
+    // Jornada sem almoço — rejeita registros de intervalo
+    const isLunchType = ["saida_almoco", "volta_almoco"].includes(type);
+    if (isLunchType && !user.hasLunchBreak) {
+      return res.status(400).json({ error: "Sua jornada é sem intervalo de almoço. Registre apenas entrada e saída." });
+    }
+
     // Reconhecimento facial obrigatório para entrada e saída
     const requiresFace = ["entrada", "saida"].includes(type);
     if (requiresFace && !req.body.faceVerified) {

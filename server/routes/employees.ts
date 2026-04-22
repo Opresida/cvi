@@ -37,6 +37,7 @@ router.get("/", async (_req, res) => {
         workStartTime: users.workStartTime,
         workEndTime: users.workEndTime,
         lunchDurationMinutes: users.lunchDurationMinutes,
+        hasLunchBreak: users.hasLunchBreak,
         active: users.active,
         createdAt: users.createdAt,
       })
@@ -58,7 +59,7 @@ router.post("/", async (req, res) => {
       name, email, password, role, employmentType,
       department, position, requiresPunch,
       weeklyHours, dailyHours, workStartTime, workEndTime,
-      lunchDurationMinutes,
+      lunchDurationMinutes, hasLunchBreak,
     } = req.body;
 
     if (!name || !email || !password) {
@@ -98,6 +99,7 @@ router.post("/", async (req, res) => {
       workStartTime: workStartTime || "08:00",
       workEndTime: workEndTime || "17:00",
       lunchDurationMinutes: lunchDurationMinutes || 60,
+      hasLunchBreak: hasLunchBreak ?? true,
     }).returning();
 
     return res.status(201).json({
@@ -127,7 +129,7 @@ router.put("/:id", async (req, res) => {
     const allowedFields = [
       "name", "email", "role", "employmentType", "department", "position",
       "requiresPunch", "weeklyHours", "dailyHours", "workStartTime", "workEndTime",
-      "lunchDurationMinutes", "active",
+      "lunchDurationMinutes", "hasLunchBreak", "active",
     ];
 
     const textFields = ["name", "department", "position"];

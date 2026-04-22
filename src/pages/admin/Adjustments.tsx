@@ -130,17 +130,17 @@ export function Adjustments() {
 
   return (
     <div>
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 mb-6 sm:mb-8">
         <div>
           <h1 className="text-xl sm:text-3xl font-bold text-neutral-900">Ajustes de Ponto</h1>
-          <p className="text-neutral-500 mt-1">
+          <p className="text-sm text-neutral-500 mt-1">
             {isAdmin ? "Gerencie solicitações de ajuste dos funcionários" : "Solicite correções nos seus registros de ponto"}
           </p>
         </div>
         <button
           type="button"
           onClick={() => setTab("new")}
-          className="inline-flex items-center gap-2 bg-primary-700 hover:bg-primary-800 text-white font-semibold px-5 py-3 rounded-xl transition-colors"
+          className="inline-flex items-center justify-center gap-2 bg-primary-700 hover:bg-primary-800 text-white font-semibold px-5 py-3 rounded-xl transition-colors"
         >
           <Plus size={18} /> Nova Solicitação
         </button>
@@ -153,31 +153,34 @@ export function Adjustments() {
       )}
 
       {/* Tabs */}
-      <div className="flex gap-1 bg-neutral-100 rounded-xl p-1 mb-6 overflow-x-auto">
+      <div className="flex gap-1 bg-neutral-100 rounded-xl p-1 mb-5 sm:mb-6 overflow-x-auto">
         {isAdmin && (
           <button type="button" onClick={() => setTab("pending")}
             className={`flex-1 py-2 px-2 sm:py-2.5 sm:px-4 rounded-lg text-xs sm:text-sm font-semibold transition-colors whitespace-nowrap
               ${tab === "pending" ? "bg-white text-neutral-900 shadow-sm" : "text-neutral-500"}`}>
-            Pendentes ({pending.length})
+            <span className="sm:hidden">Pend. ({pending.length})</span>
+            <span className="hidden sm:inline">Pendentes ({pending.length})</span>
           </button>
         )}
         <button type="button" onClick={() => setTab("mine")}
           className={`flex-1 py-2 px-2 sm:py-2.5 sm:px-4 rounded-lg text-xs sm:text-sm font-semibold transition-colors whitespace-nowrap
             ${tab === "mine" ? "bg-white text-neutral-900 shadow-sm" : "text-neutral-500"}`}>
-          {isAdmin ? "Meus ajustes" : "Minhas solicitações"} ({mine.length})
+          <span className="sm:hidden">{isAdmin ? "Meus" : "Minhas"} ({mine.length})</span>
+          <span className="hidden sm:inline">{isAdmin ? "Meus ajustes" : "Minhas solicitações"} ({mine.length})</span>
         </button>
         <button type="button" onClick={() => setTab("new")}
           className={`flex-1 py-2 px-2 sm:py-2.5 sm:px-4 rounded-lg text-xs sm:text-sm font-semibold transition-colors whitespace-nowrap
             ${tab === "new" ? "bg-white text-neutral-900 shadow-sm" : "text-neutral-500"}`}>
-          Nova solicitação
+          <span className="sm:hidden">Nova</span>
+          <span className="hidden sm:inline">Nova solicitação</span>
         </button>
       </div>
 
       {/* ============ ABA: NOVA SOLICITAÇÃO ============ */}
       {tab === "new" && (
-        <div className="bg-white rounded-2xl border border-neutral-200 p-6 sm:p-8 max-w-2xl">
-          <h2 className="text-lg font-bold text-neutral-900 mb-1">Solicitar Ajuste de Ponto</h2>
-          <p className="text-sm text-neutral-500 mb-6">
+        <div className="bg-white rounded-2xl border border-neutral-200 p-4 sm:p-8 max-w-2xl">
+          <h2 className="text-base sm:text-lg font-bold text-neutral-900 mb-1">Solicitar Ajuste de Ponto</h2>
+          <p className="text-xs sm:text-sm text-neutral-500 mb-5 sm:mb-6">
             Preencha os dados do registro que precisa ser corrigido ou adicionado. O RH irá avaliar sua solicitação.
           </p>
 
@@ -260,7 +263,7 @@ export function Adjustments() {
 
       {/* ============ ABA: MINHAS SOLICITAÇÕES ============ */}
       {tab === "mine" && (
-        <div className="space-y-4">
+        <div className="space-y-3 sm:space-y-4">
           {mine.length === 0 ? (
             <div className="bg-white rounded-2xl border border-neutral-200 px-6 py-12 text-center text-neutral-400">
               <ClipboardCheck size={32} className="mx-auto mb-3 opacity-40" />
@@ -272,7 +275,7 @@ export function Adjustments() {
             </div>
           ) : (
             mine.map((adj) => (
-              <div key={adj.id} className="bg-white rounded-2xl border border-neutral-200 p-6">
+              <div key={adj.id} className="bg-white rounded-2xl border border-neutral-200 p-4 sm:p-6">
                 <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
                   <div className="flex-1">
                     <div className="flex flex-wrap items-center gap-3 mb-2">
@@ -307,7 +310,7 @@ export function Adjustments() {
 
       {/* ============ ABA: PENDENTES (ADMIN/GESTOR) ============ */}
       {tab === "pending" && isAdmin && (
-        <div className="space-y-4">
+        <div className="space-y-3 sm:space-y-4">
           {pending.length === 0 ? (
             <div className="bg-white rounded-2xl border border-neutral-200 px-6 py-12 text-center text-neutral-400">
               <ClipboardCheck size={32} className="mx-auto mb-3 opacity-40" />
@@ -315,36 +318,36 @@ export function Adjustments() {
             </div>
           ) : (
             pending.map((adj) => (
-              <div key={adj.id} className="bg-white rounded-2xl border border-neutral-200 p-6">
-                <div className="flex flex-col gap-4">
+              <div key={adj.id} className="bg-white rounded-2xl border border-neutral-200 p-4 sm:p-6">
+                <div className="flex flex-col gap-3 sm:gap-4">
                   {/* Info do funcionário */}
                   <div>
-                    <p className="text-base font-bold text-neutral-900">{adj.userName}</p>
-                    <p className="text-xs text-neutral-500">{adj.userEmail}</p>
+                    <p className="text-sm sm:text-base font-bold text-neutral-900">{adj.userName}</p>
+                    <p className="text-xs text-neutral-500 truncate">{adj.userEmail}</p>
                   </div>
 
                   {/* Dados do ajuste */}
-                  <div className="grid sm:grid-cols-3 gap-4 p-4 bg-neutral-50 rounded-xl">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4 p-3 sm:p-4 bg-neutral-50 rounded-xl">
                     <div>
-                      <p className="text-xs text-neutral-500 mb-1">Tipo</p>
-                      <p className="text-sm font-semibold text-neutral-900">{typeLabels[adj.requestedType]}</p>
+                      <p className="text-[10px] sm:text-xs uppercase tracking-wider text-neutral-500 font-semibold mb-1">Tipo</p>
+                      <p className="text-xs sm:text-sm font-semibold text-neutral-900">{typeLabels[adj.requestedType]}</p>
                     </div>
                     <div>
-                      <p className="text-xs text-neutral-500 mb-1">Data/hora solicitada</p>
-                      <p className="text-sm font-semibold text-neutral-900 tabular-nums">
-                        {new Date(adj.requestedTimestamp).toLocaleString("pt-BR")}
+                      <p className="text-[10px] sm:text-xs uppercase tracking-wider text-neutral-500 font-semibold mb-1">Data solicitada</p>
+                      <p className="text-xs sm:text-sm font-semibold text-neutral-900 tabular-nums">
+                        {new Date(adj.requestedTimestamp).toLocaleString("pt-BR", { day: "2-digit", month: "2-digit", year: "2-digit", hour: "2-digit", minute: "2-digit" })}
                       </p>
                     </div>
-                    <div>
-                      <p className="text-xs text-neutral-500 mb-1">Solicitado em</p>
-                      <p className="text-sm text-neutral-700 tabular-nums">
-                        {new Date(adj.createdAt).toLocaleString("pt-BR")}
+                    <div className="col-span-2 sm:col-span-1">
+                      <p className="text-[10px] sm:text-xs uppercase tracking-wider text-neutral-500 font-semibold mb-1">Solicitado em</p>
+                      <p className="text-xs sm:text-sm text-neutral-700 tabular-nums">
+                        {new Date(adj.createdAt).toLocaleString("pt-BR", { day: "2-digit", month: "2-digit", year: "2-digit", hour: "2-digit", minute: "2-digit" })}
                       </p>
                     </div>
                   </div>
 
                   <div>
-                    <p className="text-sm text-neutral-700">
+                    <p className="text-xs sm:text-sm text-neutral-700">
                       <strong>Motivo:</strong> {adj.reason}
                     </p>
                     {adj.attachmentUrl && (
@@ -356,23 +359,23 @@ export function Adjustments() {
                   </div>
 
                   {/* Ações */}
-                  <div className="border-t border-neutral-200 pt-4">
-                    <div className="flex flex-col sm:flex-row gap-3">
+                  <div className="border-t border-neutral-200 pt-3 sm:pt-4">
+                    <div className="flex flex-col gap-2 sm:gap-3">
                       <input
                         type="text"
                         placeholder="Observação para o funcionário (opcional)"
                         value={reviewingId === adj.id ? reviewNotes : ""}
                         onFocus={() => setReviewingId(adj.id)}
                         onChange={(e) => { setReviewingId(adj.id); setReviewNotes(e.target.value); }}
-                        className="flex-1 px-4 py-2.5 text-sm rounded-xl border border-neutral-300 focus:border-primary-500 outline-none"
+                        className="w-full px-4 py-2.5 text-sm rounded-xl border border-neutral-300 focus:border-primary-500 outline-none"
                       />
-                      <div className="flex gap-2">
+                      <div className="grid grid-cols-2 gap-2">
                         <button type="button" onClick={() => handleReview(adj.id, "aprovado")} disabled={loading}
-                          className="inline-flex items-center gap-2 bg-accent-600 hover:bg-accent-700 text-white text-sm font-semibold px-5 py-2.5 rounded-xl disabled:opacity-50">
+                          className="inline-flex items-center justify-center gap-2 bg-accent-600 hover:bg-accent-700 text-white text-sm font-semibold px-4 py-2.5 rounded-xl disabled:opacity-50">
                           <Check size={16} /> Aprovar
                         </button>
                         <button type="button" onClick={() => handleReview(adj.id, "rejeitado")} disabled={loading}
-                          className="inline-flex items-center gap-2 bg-secondary-500 hover:bg-secondary-600 text-white text-sm font-semibold px-5 py-2.5 rounded-xl disabled:opacity-50">
+                          className="inline-flex items-center justify-center gap-2 bg-secondary-500 hover:bg-secondary-600 text-white text-sm font-semibold px-4 py-2.5 rounded-xl disabled:opacity-50">
                           <X size={16} /> Rejeitar
                         </button>
                       </div>

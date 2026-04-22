@@ -108,18 +108,69 @@ export function Timesheet() {
             </div>
           </div>
 
-          {/* Tabela dia a dia */}
-          <div className="bg-white rounded-2xl border border-neutral-200 overflow-hidden">
+          {/* Cards (mobile) / Tabela (desktop) */}
+          <div className="md:hidden space-y-3">
+            {Object.entries(data.dailyRecords as Record<string, DayRecord[]>).map(([day, records]) => {
+              const getTime = (type: string) => {
+                const r = records.find((r) => r.type === type && r.status !== "ajuste_pendente");
+                if (!r) return { text: "—", status: "" };
+                return {
+                  text: new Date(r.timestamp).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" }),
+                  status: r.status,
+                };
+              };
+              const entrada = getTime("entrada");
+              const saidaAlm = getTime("saida_almoco");
+              const voltaAlm = getTime("volta_almoco");
+              const saida = getTime("saida");
+              const hasIssue = records.some((r) => r.status === "fora_perimetro");
+
+              return (
+                <div key={day} className={`bg-white rounded-2xl border p-4 ${hasIssue ? "border-warm-200 bg-warm-50/30" : "border-neutral-200"}`}>
+                  <div className="flex items-center justify-between mb-3">
+                    <p className="text-sm font-bold text-neutral-900 capitalize tabular-nums">
+                      {new Date(day + "T12:00:00").toLocaleDateString("pt-BR", { weekday: "long", day: "2-digit", month: "2-digit" })}
+                    </p>
+                    {hasIssue && (
+                      <span className="text-[9px] uppercase tracking-wider font-bold text-warm-500 bg-warm-100 px-2 py-0.5 rounded-full">
+                        Fora
+                      </span>
+                    )}
+                  </div>
+                  <div className="grid grid-cols-2 gap-2 text-sm">
+                    <div>
+                      <p className="text-[10px] uppercase tracking-wider text-neutral-400 font-semibold">Entrada</p>
+                      <p className={`tabular-nums font-semibold ${statusColors[entrada.status] || "text-neutral-800"}`}>{entrada.text}</p>
+                    </div>
+                    <div>
+                      <p className="text-[10px] uppercase tracking-wider text-neutral-400 font-semibold">Saída</p>
+                      <p className={`tabular-nums font-semibold ${statusColors[saida.status] || "text-neutral-800"}`}>{saida.text}</p>
+                    </div>
+                    <div>
+                      <p className="text-[10px] uppercase tracking-wider text-neutral-400 font-semibold">S. Almoço</p>
+                      <p className={`tabular-nums ${statusColors[saidaAlm.status] || "text-neutral-700"}`}>{saidaAlm.text}</p>
+                    </div>
+                    <div>
+                      <p className="text-[10px] uppercase tracking-wider text-neutral-400 font-semibold">V. Almoço</p>
+                      <p className={`tabular-nums ${statusColors[voltaAlm.status] || "text-neutral-700"}`}>{voltaAlm.text}</p>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          <div className="hidden md:block bg-white rounded-2xl border border-neutral-200 overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
-                  <tr className="bg-neutral-50 text-left text-[10px] sm:text-xs uppercase tracking-wider text-neutral-500">
-                    <th className="px-2 sm:px-4 py-2 sm:py-3 font-semibold">Data</th>
-                    <th className="px-2 sm:px-4 py-2 sm:py-3 font-semibold">Entrada</th>
-                    <th className="px-2 sm:px-4 py-2 sm:py-3 font-semibold">S. Almoço</th>
-                    <th className="px-2 sm:px-4 py-2 sm:py-3 font-semibold">V. Almoço</th>
-                    <th className="px-2 sm:px-4 py-2 sm:py-3 font-semibold">Saída</th>
-                    <th className="px-2 sm:px-4 py-2 sm:py-3 font-semibold">Status</th>
+                  <tr className="bg-neutral-50 text-left text-xs uppercase tracking-wider text-neutral-500">
+                    <th className="px-4 py-3 font-semibold">Data</th>
+                    <th className="px-4 py-3 font-semibold">Entrada</th>
+                    <th className="px-4 py-3 font-semibold">S. Almoço</th>
+                    <th className="px-4 py-3 font-semibold">V. Almoço</th>
+                    <th className="px-4 py-3 font-semibold">Saída</th>
+                    <th className="px-4 py-3 font-semibold">Status</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-neutral-100">
@@ -140,15 +191,15 @@ export function Timesheet() {
 
                     return (
                       <tr key={day} className={`hover:bg-neutral-50 ${hasIssue ? "bg-warm-50/50" : ""}`}>
-                        <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm font-medium text-neutral-900 tabular-nums whitespace-nowrap">
+                        <td className="px-4 py-3 text-sm font-medium text-neutral-900 tabular-nums whitespace-nowrap">
                           {new Date(day + "T12:00:00").toLocaleDateString("pt-BR", { weekday: "short", day: "2-digit", month: "2-digit" })}
                         </td>
                         {[entrada, saidaAlm, voltaAlm, saida].map((t, i) => (
-                          <td key={i} className={`px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm tabular-nums font-medium whitespace-nowrap ${statusColors[t.status] || "text-neutral-700"}`}>
+                          <td key={i} className={`px-4 py-3 text-sm tabular-nums font-medium whitespace-nowrap ${statusColors[t.status] || "text-neutral-700"}`}>
                             {t.text}
                           </td>
                         ))}
-                        <td className="px-2 sm:px-4 py-2 sm:py-3">
+                        <td className="px-4 py-3">
                           {hasIssue && (
                             <span className="text-[10px] uppercase tracking-wider font-bold text-warm-500 bg-warm-100 px-2 py-0.5 rounded-full">
                               Fora do perímetro

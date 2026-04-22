@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { LogIn, Eye, EyeOff, Shield } from "lucide-react";
+import { LogIn, Shield } from "lucide-react";
 import logoImg from "@/assets/images/logo.png";
+import { PasswordInput } from "@/components/ui/PasswordInput";
 
 const API_URL = "";
 
@@ -9,7 +10,6 @@ export function AdminLogin() {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [showPass, setShowPass] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -114,27 +114,16 @@ export function AdminLogin() {
               <label htmlFor="login-password" className="block text-sm font-semibold text-neutral-800 mb-2">
                 Senha
               </label>
-              <div className="relative">
-                <input
-                  id="login-password"
-                  type={showPass ? "text" : "password"}
-                  required
-                  autoComplete="current-password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
-                  className="w-full px-4 py-3 pr-12 rounded-xl border border-neutral-300 bg-neutral-50 text-neutral-900
-                    focus:border-primary-500 focus:ring-2 focus:ring-primary-200 outline-none transition"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPass(!showPass)}
-                  aria-label={showPass ? "Ocultar senha" : "Mostrar senha"}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-neutral-400 hover:text-neutral-600"
-                >
-                  {showPass ? <EyeOff size={18} /> : <Eye size={18} />}
-                </button>
-              </div>
+              <PasswordInput
+                id="login-password"
+                required
+                autoComplete="current-password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="••••••••"
+                className="w-full px-4 py-3 rounded-xl border border-neutral-300 bg-neutral-50 text-neutral-900
+                  focus:border-primary-500 focus:ring-2 focus:ring-primary-200 outline-none transition"
+              />
             </div>
 
             <button
