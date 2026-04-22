@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { LogIn, Eye, EyeOff, Shield } from "lucide-react";
 import logoImg from "@/assets/images/logo.png";
 
-const API_URL = import.meta.env.VITE_API_URL || "";
+const API_URL = "";
 
 export function AdminLogin() {
   const navigate = useNavigate();

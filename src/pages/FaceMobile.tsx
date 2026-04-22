@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 import * as faceapi from "face-api.js";
 import { Camera, Loader2, CheckCircle, XCircle, AlertCircle, ScanFace } from "lucide-react";
 
-const API_URL = import.meta.env.VITE_API_URL || "";
+const API_URL = "";
 
 type Status = "loading" | "camera" | "detecting" | "success" | "fail" | "expired" | "error";
 

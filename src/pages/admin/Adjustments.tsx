@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useOutletContext } from "react-router-dom";
 import { ClipboardCheck, Check, X, Plus, Send } from "lucide-react";
 
-const API_URL = import.meta.env.VITE_API_URL || "";
+const API_URL = "";
 function getToken() { return localStorage.getItem("cvi-token") || ""; }
 
 interface Adjustment {

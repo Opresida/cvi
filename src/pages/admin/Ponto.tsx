@@ -13,7 +13,7 @@ import {
 } from "lucide-react";
 import { FaceCapture } from "@/components/ui/FaceCapture";
 
-const API_URL = import.meta.env.VITE_API_URL || "";
+const API_URL = "";
 
 interface PunchRecord {
   id: number;
