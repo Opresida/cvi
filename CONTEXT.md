@@ -103,29 +103,132 @@ Cada seção da home exibe um número grande (00–10) no canto como elemento de
 
 ### Regras trabalhistas
 - **Tolerância:** 10 min (CLT art. 58 §1º)
-- **Intervalo:** 1h almoço (futuro: 15min também)
+- **Intervalo:** 1h almoço (configurável por funcionário via `hasLunchBreak`)
 - **Banco de horas:** 12 meses compensação
 - **Horas extras:** 50% seg-sex, 75% sáb/dom/feriado (CCT SINDISAÚDE)
 - **Fechamento mensal:** dia 20
-- **Geofencing:** GPS Haversine, raio 100m da sede (R. Acari, 50, Manaus-AM)
+- **Geofencing:** GPS Haversine a partir da sede (R. Acari, 50, Manaus-AM) — 3 faixas:
+  - **0-100m** → registro válido
+  - **100-350m** → registrado com flag `fora_perimetro` (admin revisa)
+  - **Acima de 350m** → **bloqueado** (HTTP 403 com mensagem explicativa)
+  - Raios configuráveis em `systemSettings.geofenceRadius` e `geofenceMaxRadius`
+
+### Jornada sem almoço (hasLunchBreak = false)
+Funcionários com jornada reduzida ou prestadores de serviço podem ter almoço desligado:
+- Admin marca/desmarca "Tem intervalo de almoço" no cadastro (reversível)
+- Backend rejeita `saida_almoco`/`volta_almoco` com HTTP 400
+- Frontend esconde os botões correspondentes e mostra aviso
 
 ### Reconhecimento facial
 - **Obrigatório** para Entrada e Saída
 - **Opcional** para Saída/Volta Almoço (só GPS)
 - **Tecnologia:** face-api.js (TensorFlow.js) — processamento 100% no browser do funcionário
-- **Dois modos:** webcam do computador OU QR Code pelo celular (sessão temporária 5min)
+- **Dois modos:** webcam do dispositivo OU QR Code em outro celular (sessão temporária 5min)
 - **Armazenamento:** apenas embedding numérico (128 floats), nenhuma foto salva (LGPD)
 - **Threshold:** distância euclidiana < 0.6 para match
 
 ### Perfis de acesso
-- **Admin:** tudo (CRUD funcionários, aprovar ajustes, ver todos os pontos, cadastrar rostos)
+- **Admin:** tudo (CRUD funcionários, aprovar ajustes, ver todos os pontos, cadastrar rostos, tratamento, exportação, contracheques)
 - **Gestor:** mesmo que admin (futuro: restrito ao seu departamento)
-- **Funcionário:** bater ponto, solicitar ajustes, ver espelho próprio
+- **Funcionário:** bater ponto, solicitar ajustes com anexo, ver espelho próprio, revisar tratamento mensal, baixar contracheques, ver férias
 
 ### Sidebar por departamento
 - Estrutura extensível com grupos colapsáveis
-- Atual: RH (ponto, funcionários, ajustes, espelho)
+- RH (atual): Ponto, Funcionários, Ajustes, Espelho, Férias, Tratamento, Contracheques
 - Futuros: Financeiro, Exames (rotas preparadas)
+
+## Sistema de Salário
+
+### Histórico de salário (tabela `salary_history`)
+- Cada registro tem: `userId`, `grossSalary`, `netSalary`, `effectiveFrom`, `notes`, `createdBy`
+- **Salário vigente em uma data** = registro mais recente com `effectiveFrom` <= essa data
+- Permite aumento/ajuste sem perder histórico — fundamental para auditoria
+- Funcionário vê o próprio salário atual no Dashboard Home
+- Admin gerencia no modal de edição de funcionário
+
+### Validações
+- `netSalary <= grossSalary` (líquido nunca maior que bruto)
+- Valores >= 0
+- Data no formato ISO `YYYY-MM-DD`
+
+## Tratamento Mensal de Ponto
+
+### Fluxo (tabela `monthly_treatments`)
+1. **draft** — admin cria e ajusta desconto/abono/notas livremente
+2. **submitted_to_employee** — admin envia pra revisão (timer 24h inicia via `submittedAt`)
+3. **approved_by_employee** — funcionário aprova explicitamente
+4. **auto_approved** — scheduler interno aprova após 24h de inatividade
+5. **questioned** — funcionário questiona (volta pro admin corrigir)
+
+### Regras de negócio
+- 1 registro único por `(userId, referenceMonth)` — upsert
+- Desconto e abono são **digitados manualmente** pelo admin (sem cálculo automático)
+- `Total a pagar = netSalary - discountAmount + bonusAmount`
+- Admin só pode editar quando status for `draft` ou `questioned`
+- Funcionário só vê tratamentos que saíram do `draft`
+
+### Auto-aprovação (24h corridas)
+- Scheduler interno em `server/utils/autoApproveTreatments.ts`
+- Roda **a cada 5 minutos** + uma vez no startup (limpa pendências)
+- Tratamentos com `submittedAt < agora - 24h` viram `auto_approved`
+- Precisão: aprovação ocorre em até 5 min após o deadline
+
+### Notificação ao funcionário
+- Banner sticky amarelo abaixo do header quando tem tratamento pendente
+- Modal de revisão com timer ao vivo + summary completo (pontos + ajustes do mês)
+- Componente: `src/components/admin/PendingTreatmentAlert.tsx`
+
+## Férias (CLT + PJ)
+
+### Regras
+- **30 dias anuais** (período único — sem fracionamento)
+- **Sem abono pecuniário** (venda de dias)
+- Vale para **CLT e PJ** (todos os funcionários têm direito)
+- Status: `agendada` → `em_curso` → `concluida` (ou `cancelada`)
+- Bloqueio de sobreposição com outras férias ativas do mesmo funcionário
+- Aviso PDF opcional anexado pelo admin
+- Funcionário confirma ciência (botão "Confirmar ciência" — disponível mesmo sem PDF anexado)
+
+## Exportação ZIP (Folha Mensal)
+
+### Fluxo
+1. Admin trata ponto de todos os funcionários do mês
+2. Envia pra revisão, aguarda aprovação (ou auto-aprovação 24h)
+3. Clica "Exportar ZIP" → escolhe "Apenas aprovados" (recomendado) ou "Todos"
+4. Baixa o ZIP → envia pro contador externamente (WhatsApp/Email)
+5. Contador devolve contracheques em PDF
+6. Admin faz upload dos contracheques em `/admin/dashboard/rh/contracheques`
+7. Funcionários baixam os próprios
+
+### Estrutura do ZIP
+```
+folha-2026-04.zip
+├── LEIAME.txt                          (metadata)
+├── folha-consolidada-2026-04.csv       (planilha resumo)
+├── folha-2026-04.pdf                   (PDF institucional timbrado — opcional)
+└── <Nome do Funcionário>/
+    ├── resumo.txt                      (dados + total a pagar)
+    ├── pontos.csv                      (todos os pontos do mês)
+    ├── ajustes.csv                     (ajustes solicitados com status)
+    └── notas-rh.txt                    (se houver)
+```
+
+### PDF institucional (opcional)
+- Baseado em `pdf-lib` (mesmo padrão usado no projeto IDASAM)
+- Cabeçalho fixo: logo branca + dados institucionais do CVI
+- Rodapé fixo: confidencialidade + data/hora + número de página
+- Auto page-break via função `ensureSpace()` respeita margens
+- Seções: Capa / Sumário consolidado / 1 página por funcionário / Encerramento com assinatura
+
+## Contracheques
+
+### Regras
+- 1 contracheque por funcionário/mês (upsert — substitui arquivo antigo)
+- **Apenas PDF**, máximo 10 MB
+- Admin faz upload em `/admin/dashboard/rh/contracheques`
+- Funcionário baixa o próprio na mesma rota (visão adaptada por role)
+- Armazenamento: tabela `file_storage` (bytea no Neon)
+- Autorização por endpoint: dono ou admin/gestor
 
 ## Estado de Doações (Pré-Integração)
 

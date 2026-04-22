@@ -8,27 +8,44 @@
 - [ ] **Coordenadas exatas para Google Maps** em `Contact.tsx`
 - [ ] **Logos institucionais em SVG/PNG transparente** (SUS, FNS, SES/AM) para substituir selos atuais no footer
 
-## ✅ Dados Reais — Concluídos
+## 🏢 Painel Administrativo — Próximas Etapas
 
-- [x] ~~Número do WhatsApp~~ → `5592991163746`
-- [x] ~~E-mail institucional~~ → `cvi.amazonas@gmail.com`
-- [x] ~~Telefone~~ → `(92) 99116-3746`
-- [x] ~~Instagram oficial~~ → `https://www.instagram.com/cvi.am/`
-- [x] ~~Reconhecimento CER III~~ → incluído em About.tsx
-- [x] ~~Copy completa da página de serviços~~ → extraída via WebFetch do site antigo
+### Dashboard por departamento
+- [ ] **Dashboard do RH** — o Painel atual será transformado no dashboard específico do RH, com métricas de ponto, banco de horas, resumo mensal, alertas de ajustes pendentes
+- [ ] **Dashboard geral** — visão consolidada de todos os departamentos (só admin)
 
-## 📸 Fotografia
+### Novos departamentos (sidebar já preparada)
+- [ ] **Financeiro** — rota `/admin/dashboard/financeiro/*`
+- [ ] **Exames** — rota `/admin/dashboard/exames/*`
+- [ ] Cada departamento terá seu responsável e dashboard próprio
 
-- [x] ~~Pasta "Acolhimento"~~ — 9 fotos carregadas
-- [x] ~~Pasta "Apoio no Transporte"~~ — 10 fotos carregadas
-- [x] ~~Pasta "Assembleia da Fundação"~~ — 11 fotos carregadas
-- [x] ~~Pasta "Atividades"~~ — 8 fotos carregadas
-- [x] ~~Pasta "Eventos"~~ — 7 fotos carregadas
-- [ ] Legendas descritivas em cada foto da galeria (hoje `caption: ""`)
-- [ ] Foto da fachada / instalações do CVI em Manaus (para Showcase ou About)
-- [ ] Fotos adicionais para futuras campanhas (banners, redes sociais)
+### Controle de acesso por nível
+- [ ] Criar sistema de permissões granulares (não só admin/gestor/funcionario)
+- [ ] Cada gestor gerencia apenas seu departamento (ex: Enéas → RH, outro → Financeiro)
+- [ ] Funcionário vê apenas as funções do departamento ao qual pertence
+- [ ] Painel de gestão de permissões para o admin
 
-## ⚙️ Funcionalidades
+### Sistema de RH — evoluções futuras (Fase 2)
+- [ ] **Lançamentos granulares de desconto/abono** (em vez do valor total — cada lançamento vinculado a um atraso ou atestado específico)
+- [ ] **Cálculo automático de descontos** (sugestão baseada em atraso × valor-hora, admin aprova)
+- [ ] **Notificação por e-mail** quando admin envia tratamento pra revisão (hoje só janela flutuante)
+- [ ] **Dashboard financeiro mensal** (gráficos de folha, evolução de descontos/abonos, total a pagar)
+- [ ] **Integração com contador** (envio automatizado do ZIP por e-mail ao invés de download manual)
+- [ ] **Upload em lote de contracheques** (drag & drop múltiplos PDFs, matching por nome)
+- [ ] **Relatórios gerenciais** (banco de horas, horas extras, absenteísmo)
+- [ ] **Assinatura digital real** nos PDFs exportados (ICP-Brasil ou similar)
+- [ ] **Histórico auditável** de edições em tratamento (quem alterou o quê, quando)
+
+## 🔍 SEO & Analytics
+
+- [ ] Configurar Google Analytics 4 / Tag Manager (respeitar consentimento LGPD)
+- [ ] Gerar `sitemap.xml` e `robots.txt`
+- [ ] Open Graph image (1200×630) para compartilhamento social
+- [ ] Meta tags específicas por rota (`/servicos`, `/galeria`, `/privacidade`, `/brandbook`)
+- [ ] Schema.org `FAQPage` para a seção de perguntas frequentes
+- [ ] Verificar Search Console + Bing Webmaster Tools
+
+## ⚙️ Site Institucional — pendências
 
 ### Alta prioridade
 - [ ] **Integrar gateway real de doação** (Stripe, Mercado Pago, Asaas) — `src/services/donationAPI.ts` a criar quando chegar a chave
@@ -52,31 +69,16 @@
 - [ ] Vídeos institucionais com legendas + transcrição (WebVTT)
 - [ ] Área do paciente (login + agendamento)
 
-## 🏢 Painel Administrativo — Próximas Etapas
+## 📸 Fotografia
 
-### Dashboard por departamento
-- [ ] **Dashboard do RH** — o Painel atual será transformado no dashboard específico do RH, com métricas de ponto, banco de horas, resumo mensal, alertas de ajustes pendentes
-- [ ] **Dashboard geral** — visão consolidada de todos os departamentos (só admin)
-
-### Novos departamentos (sidebar já preparada)
-- [ ] **Financeiro** — rota `/admin/dashboard/financeiro/*`
-- [ ] **Exames** — rota `/admin/dashboard/exames/*`
-- [ ] Cada departamento terá seu responsável e dashboard próprio
-
-### Controle de acesso por nível
-- [ ] Criar sistema de permissões granulares (não só admin/gestor/funcionario)
-- [ ] Cada gestor gerencia apenas seu departamento (ex: Enéas → RH, outro → Financeiro)
-- [ ] Funcionário vê apenas as funções do departamento ao qual pertence
-- [ ] Painel de gestão de permissões para o admin
-
-## 🔍 SEO & Analytics
-
-- [ ] Configurar Google Analytics 4 / Tag Manager (respeitar consentimento LGPD)
-- [ ] Gerar `sitemap.xml` e `robots.txt`
-- [ ] Open Graph image (1200×630) para compartilhamento social
-- [ ] Meta tags específicas por rota (`/servicos`, `/galeria`, `/privacidade`, `/brandbook`)
-- [ ] Schema.org `FAQPage` para a seção de perguntas frequentes
-- [ ] Verificar Search Console + Bing Webmaster Tools
+- [x] ~~Pasta "Acolhimento"~~ — 9 fotos carregadas
+- [x] ~~Pasta "Apoio no Transporte"~~ — 10 fotos carregadas
+- [x] ~~Pasta "Assembleia da Fundação"~~ — 11 fotos carregadas
+- [x] ~~Pasta "Atividades"~~ — 8 fotos carregadas
+- [x] ~~Pasta "Eventos"~~ — 7 fotos carregadas
+- [ ] Legendas descritivas em cada foto da galeria (hoje `caption: ""`)
+- [ ] Foto da fachada / instalações do CVI em Manaus (para Showcase ou About)
+- [ ] Fotos adicionais para futuras campanhas (banners, redes sociais)
 
 ## ♿ Acessibilidade — Validação Final
 
@@ -106,14 +108,38 @@
 - [ ] Templates de e-mail (boas-vindas, agendamento, feedback)
 - [ ] Kit de apresentação institucional (slides, pitch deck)
 
-## 🐛 Bugs Conhecidos
+## 🏗️ Infraestrutura
 
-- [ ] **Replit: erro de conexão com servidor no login** — preview carrega mas API não conecta ao banco. Possíveis causas: (1) CORS bloqueando por domínio diferente do configurado em FRONTEND_URL, (2) DATABASE_URL no Secret do Replit pode ter formatação diferente do .env local (verificar channel_binding, sslmode), (3) Verificar se `npm run db:push` rodou com sucesso no Replit, (4) Checar logs do Express no Shell para ver o erro real. Prioridade: resolver amanhã.
+- [ ] **Migrar backend do Replit pro Render** (elimina fricção do agente Replit com migrations)
+- [ ] **Separar banco Neon em branches** (dev local vs prod) — evita testes sujarem prod
+- [ ] **Backup automatizado do Neon** (exportar schema + dados diariamente)
+- [ ] **Monitoramento de uptime** (UptimeRobot ou similar) com alerta em caso de queda
+- [ ] **Logs estruturados** do servidor (hoje `console.log` puro — migrar para Pino/Winston)
 
-## 🚀 Entregas Recentes (changelog resumido)
+## 🚀 Entregas Recentes (changelog)
 
+### Ciclo completo de folha mensal (8 blocos — commit `4670a59`)
+- ✅ **Storage de arquivos** (bytea no Neon) — base para contracheques, atestados, avisos de férias
+- ✅ **Histórico de salário** (bruto + líquido + vigência) — com UI no modal de funcionário + card no Dashboard
+- ✅ **Justificativas com anexo PDF** — multer + autorização por endpoint, preview no admin
+- ✅ **Férias 30 dias** — período único, aviso PDF opcional, acknowledge do funcionário, mudança de status
+- ✅ **Tratamento mensal** (desconto/abono manual + notas) — com pré-visualização do que o funcionário verá
+- ✅ **Ciclo de aprovação 24h** — scheduler interno, janela flutuante, aprovar/questionar/auto-aprovar
+- ✅ **Exportação ZIP** — pasta por funcionário + CSV consolidado + PDF institucional timbrado (padrão IDASAM)
+- ✅ **Contracheque** — admin faz upload PDF, funcionário baixa o próprio; substituição automática
+
+### Correções/melhorias do mesmo período
+- ✅ **Geofencing 3 faixas** (0-100m válido / 100-350m flagga / >350m bloqueia)
+- ✅ **CORS com log estruturado** (origem, IP, path, user-agent em rejeições)
+- ✅ **Responsividade mobile completa** em todas as telas admin (cards no mobile, tabela no desktop)
+- ✅ **Modal "Alterar senha"** no dropdown do avatar + endpoint autenticado
+- ✅ **Componente PasswordInput** reutilizável com toggle olho/olho-fechado
+- ✅ **Almoço opcional** (`hasLunchBreak` por funcionário, reversível)
+- ✅ **Busca de presença de hoje** na tela de Ponto (só admin/gestor, refresh 30s)
+
+### Anteriores (mantidos)
 - ✅ **Reconhecimento facial** com face-api.js (TensorFlow.js) — cadastro + verificação + QR Code mobile
-- ✅ **Sistema de ponto completo** — GPS geofencing 100m + reconhecimento facial obrigatório (entrada/saída)
+- ✅ **Sistema de ponto** — GPS geofencing + reconhecimento facial obrigatório (entrada/saída)
 - ✅ **Painel admin** com sidebar colapsável por departamento (RH, futuros: Financeiro, Exames)
 - ✅ **CRUD de funcionários** (CLT/PJ, jornada configurável, ativar/desativar/reativar)
 - ✅ **Workflow de ajustes** (solicitar → aprovar/rejeitar) com anti race condition
@@ -123,9 +149,5 @@
 - ✅ Brandbook `/brandbook` com gerador de assinatura de e-mail
 - ✅ Galeria `/galeria` com 5 pastas, 45 fotos, lightbox e CTA final
 - ✅ Página `/servicos` com catálogo completo migrado do site antigo
-- ✅ FAQ na home (seção 07)
-- ✅ Seção Galeria na home (seção 08) com cover photos
 - ✅ Contato oficial atualizado (telefone, e-mail, Instagram) em site + Schema.org
-- ✅ Reconhecimento CER III incluído em About
-- ✅ Selos institucionais no Footer
 - ✅ Rota multi-page ativada (BrowserRouter)

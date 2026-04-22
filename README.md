@@ -16,12 +16,20 @@ Construído com foco em **identidade editorial, performance, acessibilidade prem
 - 📸 Galeria com 5 pastas, lightbox acessível e 45+ fotos
 - 💚 CTAs flutuantes — WhatsApp + Doação sempre visíveis
 
-**Painel Administrativo:**
+**Painel Administrativo — Ciclo Completo de RH:**
 - 🏢 Sidebar colapsável por departamento (RH, futuros: Financeiro, Exames)
-- ⏰ Sistema de ponto com geofencing GPS (raio 100m da sede)
-- 👥 CRUD de funcionários (CLT/PJ, jornada configurável, ativar/desativar)
-- 📋 Workflow de ajustes (solicitar → aprovar/rejeitar)
-- 📄 Espelho de ponto mensal com impressão
+- ⏰ **Sistema de ponto** com geofencing GPS em 3 faixas (0-100m válido / 100-350m flag / >350m bloqueio)
+- 🍽️ **Almoço opcional** (reversível por funcionário) — jornadas reduzidas só batem entrada/saída
+- 👥 **CRUD de funcionários** (CLT/PJ, jornada configurável, salário com histórico, facial)
+- 💰 **Histórico de salário** (bruto/líquido com vigência) — admin registra, funcionário vê o próprio
+- 📋 **Ajustes de ponto** com anexo PDF e workflow de aprovação
+- 🏖️ **Férias** 30 dias com aviso PDF e confirmação de ciência
+- 🧮 **Tratamento mensal** (desconto/abono/notas) com ciclo 24h de aprovação automática
+- 📦 **Exportação ZIP** mensal: CSV consolidado + pasta por funcionário + **PDF institucional timbrado**
+- 🧾 **Contracheques** — admin faz upload PDF, funcionário baixa o próprio
+- 🔑 **Troca de senha** em modal próprio + componente reutilizável com toggle de visibilidade
+- 📄 **Espelho de ponto** mensal com impressão
+- 📱 **Mobile-first** — todas as telas admin responsivas (cards no mobile, tabela no desktop)
 - 🔐 Auth JWT com blacklist, rate limiting, sanitização XSS
 - ✅ 84 testes automatizados (62 API + 22 frontend) — 100% aprovados
 - 🛡️ Pentest com 30 vetores (SQLi, XSS, JWT, IDOR, CORS, DoS) — 0 vulnerabilidades
@@ -112,29 +120,54 @@ FRONTEND_URL=http://localhost:5000
 | Rota | Acesso | Página |
 |---|---|---|
 | `/admin` | Público | Login |
-| `/admin/dashboard` | Auth | Painel com métricas reais |
-| `/admin/dashboard/rh/ponto` | Auth | Registro de ponto (relógio + GPS) |
-| `/admin/dashboard/rh/funcionarios` | Admin/Gestor | CRUD de funcionários |
-| `/admin/dashboard/rh/ajustes` | Auth | Solicitar/aprovar ajustes de ponto |
-| `/admin/dashboard/rh/espelho` | Auth | Espelho de ponto mensal |
+| `/admin/dashboard` | Auth | Painel com métricas + card "Meu salário" |
+| `/admin/dashboard/rh/ponto` | Auth | Registro de ponto + presença de hoje (admin) |
+| `/admin/dashboard/rh/funcionarios` | Admin/Gestor | CRUD de funcionários + salário + facial |
+| `/admin/dashboard/rh/ajustes` | Auth | Ajustes com anexo PDF + workflow aprovação |
+| `/admin/dashboard/rh/espelho` | Auth | Espelho de ponto mensal imprimível |
+| `/admin/dashboard/rh/ferias` | Auth | Férias 30 dias + aviso PDF + acknowledge |
+| `/admin/dashboard/rh/tratamento` | Admin/Gestor | Tratamento mensal + exportação ZIP |
+| `/admin/dashboard/rh/contracheques` | Auth | Upload admin / Download funcionário |
 
 ### API (Backend)
 
-| Método | Rota | Descrição |
-|---|---|---|
-| POST | `/api/auth/login` | Login (JWT 8h) |
-| POST | `/api/auth/logout` | Logout (blacklist token) |
-| GET | `/api/auth/me` | Dados do usuário logado |
-| GET/POST/PUT/DELETE | `/api/employees` | CRUD de funcionários (admin) |
-| POST | `/api/ponto/registrar` | Registrar ponto (GPS + geofencing) |
-| GET | `/api/ponto/hoje` | Registros do dia |
-| GET | `/api/ponto/historico` | Histórico (filtro por dias) |
-| GET | `/api/ponto/espelho` | Espelho mensal |
-| GET | `/api/ponto/todos` | Todos os registros (admin) |
-| POST | `/api/adjustments` | Solicitar ajuste |
-| GET | `/api/adjustments/mine` | Minhas solicitações |
-| GET | `/api/adjustments/pending` | Pendentes de aprovação (admin) |
-| PUT | `/api/adjustments/:id/review` | Aprovar/rejeitar ajuste |
+**Autenticação** (`/api/auth/*`)
+- POST `/login` — JWT 8h
+- POST `/logout` — blacklist token
+- GET `/me` — user logado
+- POST `/change-password` — troca senha + invalida token
+
+**Funcionários** (`/api/employees/*`) — admin/gestor
+CRUD + soft delete
+
+**Ponto** (`/api/ponto/*`)
+- POST `/registrar` — com geofencing 3 faixas + bloqueio de almoço se `hasLunchBreak=false`
+- GET `/hoje` / `/historico` / `/espelho` / `/todos`
+
+**Ajustes** (`/api/adjustments/*`)
+- POST `/` — multipart com anexo PDF
+- GET `/mine` / `/pending` / `/:id/attachment`
+- PUT `/:id/review`
+
+**Salário** (`/api/salary/*`)
+- GET `/:userId/current` — vigente hoje
+- GET `/:userId/history` — histórico completo
+- POST `/:userId` — novo registro (admin)
+
+**Férias** (`/api/vacations/*`)
+- GET `/` · POST `/` · PUT `/:id` · DELETE `/:id`
+- POST `/:id/notice` · GET `/:id/notice`
+- POST `/:id/acknowledge`
+
+**Tratamento** (`/api/treatments/*`)
+- GET `/` · GET `/summary/:id` · POST `/`
+- POST `/:id/submit` · `/:id/approve` · `/:id/question`
+
+**Exportação** (`/api/exports/*`)
+- GET `/monthly?month=YYYY-MM&status=approved|all&pdf=1` — stream ZIP
+
+**Contracheques** (`/api/paystubs/*`)
+- GET `/` · POST `/` · GET `/:id/download` · DELETE `/:id`
 
 ---
 

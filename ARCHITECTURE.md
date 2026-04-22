@@ -109,74 +109,113 @@ localStorage (persistência client-side)
 cvi/
 ├── public/
 │   └── favicon.png
-├── src/
-│   ├── assets/images/           # Logos, fotos, hero, team
-│   │   ├── logo.png
-│   │   ├── logo-white.png
+├── server/                         # Backend Express + Drizzle
+│   ├── db/
+│   │   ├── index.ts                # Conexão Neon serverless
+│   │   └── schema.ts               # Todas as tabelas + enums
+│   ├── routes/
+│   │   ├── auth.ts                 # Login, logout, me, change-password
+│   │   ├── employees.ts            # CRUD de funcionários
+│   │   ├── ponto.ts                # Registro + geofencing 3 faixas + espelho
+│   │   ├── adjustments.ts          # Ajustes com anexo PDF (multer)
+│   │   ├── face.ts                 # Reconhecimento facial + sessões QR
+│   │   ├── salary.ts               # Histórico de salário
+│   │   ├── vacations.ts            # Férias + aviso PDF + acknowledge
+│   │   ├── treatments.ts           # Tratamento mensal + ciclo 24h
+│   │   ├── exports.ts              # ZIP mensal (CSV + PDF institucional)
+│   │   └── paystubs.ts             # Upload/download contracheque
+│   ├── middleware/
+│   │   └── auth.ts                 # JWT verify + blacklist + roles
+│   ├── utils/
+│   │   ├── geofence.ts             # Haversine distance
+│   │   ├── sanitize.ts             # XSS prevention
+│   │   ├── tokenBlacklist.ts       # JWT invalidation
+│   │   ├── fileStorage.ts          # bytea helpers (saveFile/loadFile)
+│   │   ├── autoApproveTreatments.ts # Scheduler 24h interno
+│   │   └── pdfFolha.ts             # PDF institucional (pdf-lib)
+│   ├── index.ts                    # Express server + rate limit + scheduler boot
+│   └── seed.ts                     # Admin inicial + systemSettings
+│
+├── src/                            # Frontend React + Vite
+│   ├── assets/images/              # Logos, fotos, hero, team
+│   │   ├── logo.png                # Colorido (site público)
+│   │   ├── logo-white.png          # Branco (header dashboard + PDF timbrado)
+│   │   ├── logo-symbol.png
 │   │   ├── hero-transition.jpeg
 │   │   └── team-photo.jpg
 │   │
 │   ├── components/
-│   │   ├── layout/              # Estrutura global
+│   │   ├── layout/                 # Estrutura global do site público
 │   │   │   ├── Header.tsx
 │   │   │   ├── Footer.tsx
 │   │   │   ├── SkipLinks.tsx
 │   │   │   ├── AccessibilityToolbar.tsx
-│   │   │   ├── CookieConsent.tsx      # Banner + modal LGPD
+│   │   │   ├── CookieConsent.tsx   # Banner + modal LGPD
 │   │   │   ├── FloatingDonateCTA.tsx
 │   │   │   └── FloatingWhatsApp.tsx
 │   │   │
-│   │   ├── sections/            # Seções da home single-page
-│   │   │   ├── Hero.tsx
-│   │   │   ├── Showcase.tsx
-│   │   │   ├── About.tsx
-│   │   │   ├── Impact.tsx
-│   │   │   ├── Services.tsx     # Home section + CTA /servicos
-│   │   │   ├── Pillars.tsx
-│   │   │   ├── Team.tsx
-│   │   │   ├── Testimonials.tsx
-│   │   │   ├── Faq.tsx
-│   │   │   ├── Galeria.tsx      # Home preview + CTA /galeria
-│   │   │   ├── Donate.tsx
-│   │   │   └── Contact.tsx
+│   │   ├── sections/               # Seções da home single-page
+│   │   │   ├── Hero.tsx / Showcase.tsx / About.tsx / Impact.tsx
+│   │   │   ├── Services.tsx / Pillars.tsx / Team.tsx
+│   │   │   ├── Testimonials.tsx / Faq.tsx
+│   │   │   ├── Galeria.tsx / Donate.tsx / Contact.tsx
+│   │   │
+│   │   ├── admin/                  # Componentes do painel administrativo
+│   │   │   ├── PendingTreatmentAlert.tsx  # Banner sticky + modal de revisão 24h
+│   │   │   └── TreatmentSummary.tsx       # Pontos + ajustes consolidados do mês
 │   │   │
 │   │   └── ui/
 │   │       ├── Button.tsx
-│   │       └── SectionLabel.tsx
+│   │       ├── SectionLabel.tsx
+│   │       ├── FaceCapture.tsx     # Webcam + QR Code pra facial
+│   │       ├── PasswordInput.tsx   # Input senha com toggle olho
+│   │       └── SplashLoader.tsx
 │   │
-│   ├── pages/                   # Rotas
+│   ├── pages/                      # Rotas
 │   │   ├── Home.tsx
 │   │   ├── Servicos.tsx
 │   │   ├── Galeria.tsx
 │   │   ├── Privacidade.tsx
-│   │   └── Brandbook.tsx
+│   │   ├── Brandbook.tsx
+│   │   ├── NotFound.tsx
+│   │   ├── FaceMobile.tsx          # Scan QR → captura facial via celular
+│   │   └── admin/                  # Painel administrativo
+│   │       ├── Login.tsx
+│   │       ├── Dashboard.tsx       # Shell com sidebar + modal trocar senha
+│   │       ├── DashboardHome.tsx   # Home do admin + card "Meu salário"
+│   │       ├── Ponto.tsx           # Registro + presença de hoje (admin)
+│   │       ├── Employees.tsx       # CRUD + salário + facial
+│   │       ├── Adjustments.tsx     # Workflow com anexo
+│   │       ├── Timesheet.tsx       # Espelho mensal imprimível
+│   │       ├── Vacations.tsx       # Férias (admin gerencia + funcionário confirma)
+│   │       ├── Treatments.tsx      # Tratamento mensal + export ZIP
+│   │       └── Paystubs.tsx        # Contracheques (adapta por role)
 │   │
 │   ├── data/
-│   │   └── content.ts           # nav, hero, about, impact,
-│   │                            # servicesPage, faq, gallery,
-│   │                            # testimonials, donate, contact,
-│   │                            # footer
+│   │   └── content.ts              # Copy centralizada do site público
 │   │
 │   ├── hooks/
-│   │   ├── useCountUp.ts
-│   │   ├── useScrollspy.ts
-│   │   ├── useReducedMotion.ts
+│   │   ├── useCountUp.ts / useScrollspy.ts / useReducedMotion.ts
 │   │   ├── useAccessibilitySettings.ts
-│   │   └── useCookieConsent.ts  # LGPD (localStorage versionado)
+│   │   └── useCookieConsent.ts
 │   │
-│   ├── App.tsx                  # Routes + CookieConsent
-│   ├── main.tsx                 # BrowserRouter bootstrap
-│   └── index.css                # Design tokens + Tailwind + a11y CSS
+│   ├── App.tsx                     # Routes + CookieConsent
+│   ├── main.tsx                    # BrowserRouter bootstrap
+│   └── index.css                   # Design tokens + Tailwind + a11y CSS
 │
-├── ARCHITECTURE.md              # Este arquivo
+├── drizzle.config.ts
+├── vite.config.ts                  # Proxy /api → localhost:3001
+├── netlify.toml
+├── .replit
+├── scripts/
+│   └── post-merge.sh               # npm install automático após git pull
+├── ARCHITECTURE.md                 # Este arquivo
 ├── CONTEXT.md
 ├── README.md
 ├── TODO.md
 ├── eslint.config.js
-├── netlify.toml
 ├── package.json
-├── tsconfig.json
-└── vite.config.ts
+└── tsconfig.json
 ```
 
 ## Componentes — Responsabilidades
@@ -279,6 +318,132 @@ Se não há decisão registrada:
                      └─► Outros componentes reagem
                          (ex: ativar GA4 se analytics=true)
 ```
+
+## Backend — Schema do Banco (Drizzle + Neon)
+
+### Tabelas principais
+| Tabela | Propósito |
+|---|---|
+| `users` | Funcionários, gestores, admins — com `hasLunchBreak`, `faceDescriptor`, jornada configurável |
+| `system_settings` | Config global: coords da sede, raio de geofencing, tolerância, fechamento |
+| `punch_records` | Pontos batidos (entrada/saída/almoço) com status (valido/fora_perimetro/ajuste_pendente/ajustado) |
+| `punch_adjustments` | Solicitações de ajuste com `attachmentFileId` (anexo PDF) |
+| `file_storage` | Bytea genérico pra PDFs (atestados, avisos de férias, contracheques) |
+| `salary_history` | Histórico de salário por vigência (bruto/líquido/effectiveFrom) |
+| `vacations` | Férias 30 dias com status enum + aviso PDF + acknowledge |
+| `monthly_treatments` | Tratamento mensal com workflow de aprovação 24h |
+| `paystubs` | Contracheques mensais (1 por funcionário/mês, apenas PDF) |
+
+### Enums
+- `user_role`: admin / gestor / funcionario
+- `employment_type`: clt / pj
+- `punch_type`: entrada / saida_almoco / volta_almoco / saida
+- `punch_status`: valido / fora_perimetro / ajuste_pendente / ajustado
+- `adjustment_status`: pendente / aprovado / rejeitado
+- `vacation_status`: agendada / em_curso / concluida / cancelada
+- `treatment_status`: draft / submitted_to_employee / approved_by_employee / auto_approved / questioned
+
+## Backend — Rotas (API REST)
+
+### Autenticação (`/api/auth/*`)
+| Método | Rota | Descrição |
+|---|---|---|
+| POST | `/login` | JWT 8h + cookie httpOnly |
+| POST | `/logout` | Blacklist do token |
+| GET | `/me` | Dados do user logado |
+| POST | `/change-password` | Troca senha + invalida token atual |
+
+### Funcionários (`/api/employees/*`) — admin/gestor
+CRUD completo + soft delete (ativa/desativa) + upload facial
+
+### Ponto (`/api/ponto/*`)
+| Rota | Descrição |
+|---|---|
+| POST `/registrar` | Registra ponto (3 faixas de geofencing + rejeita almoço se hasLunchBreak=false) |
+| GET `/hoje` | Pontos do dia (próprios) |
+| GET `/historico` | Histórico N dias (próprio) |
+| GET `/espelho` | Espelho mensal (próprio; admin vê de outros via ?userId) |
+| GET `/todos` | Todos do período (admin/gestor) |
+
+### Ajustes (`/api/adjustments/*`)
+- POST `/` — cria ajuste com anexo multipart
+- GET `/mine` — próprios
+- GET `/pending` — pendentes (admin/gestor)
+- GET `/:id/attachment` — baixa anexo (dono ou staff)
+- PUT `/:id/review` — aprova/rejeita (admin/gestor)
+
+### Salário (`/api/salary/*`)
+- GET `/:userId/current` — vigente na data atual
+- GET `/:userId/history` — todo histórico
+- POST `/:userId` — novo registro (admin/gestor)
+- DELETE `/entry/:id` — remove registro (admin/gestor)
+
+### Férias (`/api/vacations/*`)
+- GET `/` — lista (admin todos, funcionário só próprias)
+- POST `/` — agenda 30 dias + aviso PDF opcional (admin/gestor)
+- PUT `/:id` — muda status/notes (admin/gestor)
+- POST `/:id/notice` — anexa/substitui PDF do aviso
+- GET `/:id/notice` — baixa PDF (dono ou staff)
+- POST `/:id/acknowledge` — funcionário confirma ciência
+- DELETE `/:id` — remove (admin/gestor)
+
+### Tratamento (`/api/treatments/*`)
+- GET `/` — lista filtrada (admin todos, funcionário só próprios não-draft)
+- GET `/summary/:id` — pontos + ajustes do mês (consolidado)
+- GET `/:userId/:month` — detalhe (admin/gestor)
+- POST `/` — upsert draft (admin/gestor)
+- POST `/:id/submit` — envia pra revisão (admin/gestor)
+- POST `/:id/approve` — funcionário aprova
+- POST `/:id/question` — funcionário questiona
+- DELETE `/:id` — remove draft
+
+### Exportação (`/api/exports/*`) — admin/gestor
+- GET `/monthly?month=YYYY-MM&status=approved|all&pdf=1` — ZIP stream
+
+### Contracheques (`/api/paystubs/*`)
+- GET `/` — admin filtra por mês, funcionário vê histórico próprio
+- POST `/` — upload PDF (admin/gestor) com upsert por mês
+- GET `/:id/download` — baixa (dono ou staff)
+- DELETE `/:id` — remove registro + arquivo
+
+### Face (`/api/face/*`)
+Cadastro e verificação facial + sessões QR Code para mobile
+
+## Backend — Scheduler Interno
+
+### Auto-aprovação de tratamentos (24h corridas)
+- Arquivo: [`server/utils/autoApproveTreatments.ts`](server/utils/autoApproveTreatments.ts)
+- Inicializado em `server/index.ts:listen` via `startAutoApproveScheduler()`
+- `runAutoApproveSweep()` roda no startup + a cada **5 minutos** via `setInterval`
+- Query: `UPDATE monthly_treatments SET status='auto_approved' WHERE status='submitted_to_employee' AND submittedAt < now() - 24h`
+- Precisão: aprovação ocorre em até 5 min após o deadline (aceitável pra folha mensal)
+
+## Backend — Storage de Arquivos (bytea)
+
+### Padrão seguro por design
+- Tabela `file_storage` com colunas: `id`, `filename`, `mimeType`, `sizeBytes`, `data` (bytea), `uploadedBy`, `uploadedAt`
+- Helpers centralizados em [`server/utils/fileStorage.ts`](server/utils/fileStorage.ts)
+- **Sem endpoint genérico de download** — cada feature expõe seu próprio download autorizado:
+  - `GET /api/adjustments/:id/attachment` — dono ou staff
+  - `GET /api/vacations/:id/notice` — dono ou staff
+  - `GET /api/paystubs/:id/download` — dono ou staff
+- Isso evita que qualquer usuário logado baixe qualquer arquivo (IDOR prevention)
+
+## Backend — PDF Institucional (pdf-lib)
+
+### Padrão adaptado do projeto IDASAM
+- Arquivo: [`server/utils/pdfFolha.ts`](server/utils/pdfFolha.ts)
+- Biblioteca: **pdf-lib** (JS puro, sem headless browser)
+- A4 em pontos (72dpi): 595 × 842
+- Margens: header 85px / footer 50px / gap 35px entre header e conteúdo
+- Funções auxiliares:
+  - `drawHeader(pg)` — logo branca + institucional + faixa colorida
+  - `drawFooter(pg, pageNum)` — confidencialidade + data + número da página
+  - `ensureSpace(needed)` — **a chave**: antes de desenhar, checa espaço; se não cabe → desenha footer + addPage + desenha header + reseta curY
+  - `drawSectionTitle(title)` — barra lateral colorida + título
+  - `drawField(label, value)` — label bold + valor com word-wrap automático
+  - `drawParagraph(text)` — parágrafo com wrap multi-linha
+- Toda página nova (automática ou manual) redesenha header/footer — zero risco de texto vazar pro rodapé
 
 ## Decisões de Design
 
