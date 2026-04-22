@@ -19,6 +19,7 @@ const PORT = process.env.PORT || 3001;
 function buildAllowedOrigins(): string[] {
   const origins: string[] = [
     "http://localhost:5000",
+    "https://cviam.com.br",
     "https://www.cviam.com.br",
   ];
 
