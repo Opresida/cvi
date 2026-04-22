@@ -2,12 +2,16 @@ import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import rateLimit from "express-rate-limit";
+import path from "path";
+import { fileURLToPath } from "url";
 import "dotenv/config";
 import authRoutes from "./routes/auth";
 import pontoRoutes from "./routes/ponto";
 import employeesRoutes from "./routes/employees";
 import adjustmentsRoutes from "./routes/adjustments";
 import faceRoutes from "./routes/face";
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -59,8 +63,17 @@ app.get("/api/health", (_req, res) => {
   res.json({ status: "ok", timestamp: new Date().toISOString() });
 });
 
+// Servir frontend (build estático) em produção / Replit
+const distPath = path.join(__dirname, "..", "dist");
+app.use(express.static(distPath));
+
+// SPA fallback — qualquer rota que não seja /api vai pro index.html
+app.get("/{*splat}", (_req, res) => {
+  res.sendFile(path.join(distPath, "index.html"));
+});
+
 app.listen(PORT, () => {
-  console.log(`🟢 CVI Backend rodando na porta ${PORT}`);
+  console.log(`🟢 CVI rodando na porta ${PORT}`);
 });
 
 export default app;

@@ -3,7 +3,7 @@ import * as faceapi from "face-api.js";
 import { Camera, Loader2, CheckCircle, XCircle, Smartphone } from "lucide-react";
 import { QRCodeCanvas } from "qrcode.react";
 
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3001";
+const API_URL = import.meta.env.VITE_API_URL || "";
 const SITE_URL = typeof window !== "undefined" ? window.location.origin : "http://localhost:5000";
 function getToken() { return localStorage.getItem("cvi-token") || ""; }
 

@@ -15,7 +15,7 @@ import {
 } from "lucide-react";
 import logoImg from "@/assets/images/logo-white.png";
 
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3001";
+const API_URL = import.meta.env.VITE_API_URL || "";
 
 interface UserData {
   id: number;
