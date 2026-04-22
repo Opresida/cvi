@@ -9,7 +9,9 @@ import {
   MapPin,
   Check,
   AlertCircle,
+  ScanFace,
 } from "lucide-react";
+import { FaceCapture } from "@/components/ui/FaceCapture";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3001";
 
@@ -53,6 +55,8 @@ export function Ponto() {
   const [statusMsg, setStatusMsg] = useState("");
   const [loading, setLoading] = useState(false);
   const [location, setLocation] = useState<{ lat: string; lng: string } | null>(null);
+  const [showFace, setShowFace] = useState(false);
+  const [faceVerified, setFaceVerified] = useState<{ name: string; confidence: number } | null>(null);
 
   // Relógio em tempo real
   useEffect(() => {
@@ -95,8 +99,19 @@ export function Ponto() {
     fetchToday();
   }, [fetchToday]);
 
+  // Tipos que exigem reconhecimento facial
+  const FACE_REQUIRED_TYPES = ["entrada", "saida"];
+
   // Registrar ponto
   const handlePunch = async (type: string) => {
+    // Bloquear se tipo exige face e não foi verificado
+    if (FACE_REQUIRED_TYPES.includes(type) && !faceVerified) {
+      setStatus("error");
+      setStatusMsg("Reconhecimento facial obrigatório para Entrada e Saída. Verifique sua identidade primeiro.");
+      setTimeout(() => setStatus("idle"), 4000);
+      return;
+    }
+
     setLoading(true);
     setStatus("idle");
     try {
@@ -111,6 +126,7 @@ export function Ponto() {
           type,
           latitude: location?.lat,
           longitude: location?.lng,
+          faceVerified: FACE_REQUIRED_TYPES.includes(type) ? true : undefined,
         }),
       });
 
@@ -180,22 +196,86 @@ export function Ponto() {
         )}
       </div>
 
+      {/* Reconhecimento facial — obrigatório para Entrada e Saída */}
+      <div className="mb-6 sm:mb-8">
+        {!showFace ? (
+          <button
+            type="button"
+            onClick={() => setShowFace(true)}
+            className={`w-full flex items-center justify-center gap-3 font-semibold py-4 rounded-2xl transition-colors ${
+              faceVerified
+                ? "bg-accent-600 text-white"
+                : "bg-neutral-800 hover:bg-neutral-900 text-white"
+            }`}
+          >
+            <ScanFace size={22} aria-hidden="true" />
+            {faceVerified
+              ? `Identidade confirmada: ${faceVerified.name} (${faceVerified.confidence}%)`
+              : "Verificar identidade — obrigatório para Entrada e Saída"
+            }
+          </button>
+        ) : (
+          <div className="bg-white rounded-2xl border-2 border-primary-200 p-5 sm:p-8">
+            <h3 className="text-lg font-bold text-neutral-900 mb-2 flex items-center gap-2">
+              <ScanFace size={20} aria-hidden="true" className="text-primary-700" />
+              Reconhecimento Facial
+            </h3>
+            <p className="text-sm text-neutral-500 mb-4">
+              Obrigatório para registrar <strong>Entrada</strong> e <strong>Saída</strong>. Almoço requer apenas localização GPS.
+            </p>
+            <FaceCapture
+              mode="verify"
+              onVerified={(verifiedUser, confidence) => {
+                setFaceVerified({ name: verifiedUser.name, confidence });
+                setShowFace(false);
+                setStatus("success");
+                setStatusMsg(`Identidade confirmada: ${verifiedUser.name} (${confidence}% confiança)`);
+                setTimeout(() => setStatus("idle"), 4000);
+              }}
+              onError={(msg) => {
+                setStatus("error");
+                setStatusMsg(msg);
+                setTimeout(() => setStatus("idle"), 3000);
+              }}
+            />
+          </div>
+        )}
+      </div>
+
       {/* Botões de registro */}
       <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        {punchTypes.map((pt) => (
-          <button
-            key={pt.type}
-            type="button"
-            onClick={() => handlePunch(pt.type)}
-            disabled={loading}
-            className={`${pt.color} text-white font-semibold py-5 rounded-2xl flex flex-col items-center gap-2
-              disabled:opacity-50 disabled:cursor-not-allowed transition-colors
-              focus-visible:ring-4 focus-visible:ring-primary-300`}
-          >
-            <pt.icon size={28} aria-hidden="true" />
-            <span>{pt.label}</span>
-          </button>
-        ))}
+        {punchTypes.map((pt) => {
+          const needsFace = FACE_REQUIRED_TYPES.includes(pt.type);
+          const blocked = needsFace && !faceVerified;
+          return (
+            <button
+              key={pt.type}
+              type="button"
+              onClick={() => handlePunch(pt.type)}
+              disabled={loading || blocked}
+              className={`${blocked ? "bg-neutral-300 cursor-not-allowed" : pt.color} text-white font-semibold py-5 rounded-2xl flex flex-col items-center gap-2
+                disabled:opacity-60 disabled:cursor-not-allowed transition-colors
+                focus-visible:ring-4 focus-visible:ring-primary-300 relative`}
+            >
+              <pt.icon size={28} aria-hidden="true" />
+              <span>{pt.label}</span>
+              {needsFace && (
+                <span className={`text-[10px] uppercase tracking-wider font-bold mt-1 flex items-center gap-1 ${
+                  faceVerified ? "text-white/70" : "text-white/50"
+                }`}>
+                  <ScanFace size={12} aria-hidden="true" />
+                  {faceVerified ? "Face OK" : "Requer face"}
+                </span>
+              )}
+              {!needsFace && (
+                <span className="text-[10px] uppercase tracking-wider font-bold mt-1 text-white/70 flex items-center gap-1">
+                  <MapPin size={12} aria-hidden="true" />
+                  Só GPS
+                </span>
+              )}
+            </button>
+          );
+        })}
       </div>
 
       {/* Registros de hoje */}

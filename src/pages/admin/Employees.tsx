@@ -1,7 +1,8 @@
 import { useState, useEffect, useCallback } from "react";
 import {
-  UserPlus, Search, Edit2, UserX, X, Save, Users, RefreshCw,
+  UserPlus, Search, Edit2, UserX, X, Save, Users, RefreshCw, ScanFace,
 } from "lucide-react";
+import { FaceCapture } from "@/components/ui/FaceCapture";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3001";
 function getToken() { return localStorage.getItem("cvi-token") || ""; }
@@ -39,6 +40,7 @@ export function Employees() {
   const [loading, setLoading] = useState(false);
   const [msg, setMsg] = useState("");
   const [confirmDelete, setConfirmDelete] = useState<number | null>(null);
+  const [faceRegisterId, setFaceRegisterId] = useState<number | null>(null);
 
   const fetchEmployees = useCallback(async () => {
     try {
@@ -306,6 +308,31 @@ export function Employees() {
         </div>
       )}
 
+      {/* Modal de cadastro facial */}
+      {faceRegisterId !== null && (
+        <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4" onClick={() => setFaceRegisterId(null)}>
+          <div className="bg-white rounded-2xl shadow-elevated w-full max-w-lg p-6 sm:p-8" onClick={e => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-lg font-bold text-neutral-900 flex items-center gap-2">
+                <ScanFace size={20} className="text-primary-700" />
+                Cadastrar Rosto
+              </h3>
+              <button type="button" onClick={() => setFaceRegisterId(null)} className="p-2 rounded-lg hover:bg-neutral-100">
+                <X size={20} />
+              </button>
+            </div>
+            <p className="text-sm text-neutral-500 mb-4">
+              Funcionário: <strong>{employees.find(e => e.id === faceRegisterId)?.name}</strong>
+            </p>
+            <FaceCapture
+              mode="register"
+              userId={faceRegisterId}
+              onError={(msg) => { setMsg(msg); setFaceRegisterId(null); setTimeout(() => setMsg(""), 3000); }}
+            />
+          </div>
+        </div>
+      )}
+
       {/* Modal de confirmação de desativação */}
       {confirmDelete !== null && (
         <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4" onClick={() => setConfirmDelete(null)}>
@@ -377,6 +404,10 @@ export function Employees() {
                     </td>
                     <td className="px-3 sm:px-6 py-3 sm:py-4 text-right">
                       <div className="flex items-center justify-end gap-2">
+                        <button type="button" onClick={() => setFaceRegisterId(emp.id)} title="Cadastrar rosto"
+                          className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-sm font-medium text-neutral-700 bg-neutral-100 hover:bg-neutral-200 transition-colors">
+                          <ScanFace size={14} /> Rosto
+                        </button>
                         <button type="button" onClick={() => startEdit(emp)} title="Editar"
                           className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-sm font-medium text-primary-700 bg-primary-50 hover:bg-primary-100 transition-colors">
                           <Edit2 size={14} /> Editar

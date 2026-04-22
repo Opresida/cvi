@@ -7,6 +7,7 @@ import authRoutes from "./routes/auth";
 import pontoRoutes from "./routes/ponto";
 import employeesRoutes from "./routes/employees";
 import adjustmentsRoutes from "./routes/adjustments";
+import faceRoutes from "./routes/face";
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -51,6 +52,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/ponto", pontoRoutes);
 app.use("/api/employees", employeesRoutes);
 app.use("/api/adjustments", adjustmentsRoutes);
+app.use("/api/face", faceRoutes);
 
 // Health check
 app.get("/api/health", (_req, res) => {

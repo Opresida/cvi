@@ -67,6 +67,9 @@ export const users = pgTable("users", {
   workStartTime: varchar("work_start_time", { length: 5 }).default("08:00"), // HH:MM
   workEndTime: varchar("work_end_time", { length: 5 }).default("17:00"),
   lunchDurationMinutes: integer("lunch_duration_minutes").notNull().default(60),
+  // Reconhecimento facial (embedding 128d)
+  faceDescriptor: text("face_descriptor"), // JSON array de 128 números
+  faceRegisteredAt: timestamp("face_registered_at"),
   //
   active: boolean("active").notNull().default(true),
   createdAt: timestamp("created_at").notNull().defaultNow(),

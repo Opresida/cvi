@@ -56,6 +56,12 @@ router.post("/registrar", async (req: AuthRequest, res) => {
       return res.status(400).json({ error: "Seu perfil não requer registro de ponto" });
     }
 
+    // Reconhecimento facial obrigatório para entrada e saída
+    const requiresFace = ["entrada", "saida"].includes(type);
+    if (requiresFace && !req.body.faceVerified) {
+      return res.status(400).json({ error: "Reconhecimento facial obrigatório para entrada e saída" });
+    }
+
     // HIGH FIX #4: Validação de coordenadas
     const coords = validateCoordinates(latitude, longitude);
     if (!coords.valid) {

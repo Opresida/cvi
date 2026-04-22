@@ -39,7 +39,8 @@ Construído com foco em **identidade editorial, performance, acessibilidade prem
 | **Framer Motion 12** | Animações (respeita `prefers-reduced-motion`) |
 | **React Router 7** | Multi-page + admin routes |
 | **Lucide React** | Ícones SVG |
-| **qrcode.react** | QR Code Pix dinâmico |
+| **qrcode.react** | QR Code Pix + sessões faciais |
+| **face-api.js** | Reconhecimento facial (TensorFlow.js, roda no browser) |
 
 ### Backend
 | Tecnologia | Propósito |
@@ -241,6 +242,27 @@ cvi/
 | Fechamento mensal | Dia 20 |
 | Espelho de ponto | Gerado para RH + funcionário |
 | Sede | R. Acari, 50 - Conj. Atílio Andreazza, Manaus-AM |
+
+---
+
+## 🤖 Reconhecimento Facial
+
+| | |
+|---|---|
+| **Biblioteca** | face-api.js (TensorFlow.js) — MIT, 100% gratuita |
+| **Processamento** | 100% local no navegador (nenhum dado sai do dispositivo) |
+| **Armazenamento** | Apenas embedding numérico (128 floats) — nenhuma foto salva |
+| **Obrigatório para** | Entrada e Saída (GPS + Face juntos) |
+| **Opcional para** | Saída/Volta Almoço (só GPS 100m) |
+| **Modos** | Webcam do computador OU QR Code pelo celular |
+| **Threshold** | Distância euclidiana < 0.6 para match positivo |
+
+### Fluxo QR Code (sem webcam)
+1. Admin/funcionário clica "QR Code pelo Celular" no computador
+2. Sistema gera sessão temporária (5 min) + QR Code
+3. Funcionário escaneia com celular → abre `/face/{sessionId}`
+4. Página mobile carrega face-api.js → captura rosto pela câmera do celular
+5. Embedding enviado ao servidor → computador atualiza automaticamente via polling
 
 ---
 

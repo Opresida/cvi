@@ -112,6 +112,13 @@
 
 ## 🚀 Entregas Recentes (changelog resumido)
 
+- ✅ **Reconhecimento facial** com face-api.js (TensorFlow.js) — cadastro + verificação + QR Code mobile
+- ✅ **Sistema de ponto completo** — GPS geofencing 100m + reconhecimento facial obrigatório (entrada/saída)
+- ✅ **Painel admin** com sidebar colapsável por departamento (RH, futuros: Financeiro, Exames)
+- ✅ **CRUD de funcionários** (CLT/PJ, jornada configurável, ativar/desativar/reativar)
+- ✅ **Workflow de ajustes** (solicitar → aprovar/rejeitar) com anti race condition
+- ✅ **Espelho de ponto** mensal com impressão e assinatura
+- ✅ **Segurança** — 84 testes + 30 vetores de pentest + sanitização XSS + JWT blacklist + rate limiting
 - ✅ Sistema LGPD completo (banner + modal + política + integração Footer/Toolbar)
 - ✅ Brandbook `/brandbook` com gerador de assinatura de e-mail
 - ✅ Galeria `/galeria` com 5 pastas, 45 fotos, lightbox e CTA final

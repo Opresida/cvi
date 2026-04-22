@@ -8,13 +8,23 @@ Reconhecido pelo Ministério da Saúde como **Centro Especializado em Reabilita�
 
 ## Stack Técnica
 
+### Frontend
 - **Framework:** React 19 + TypeScript 5
 - **Build:** Vite 8
 - **Estilização:** Tailwind CSS 4 (design tokens via `@theme`)
 - **Animações:** Framer Motion 12 (respeita `prefers-reduced-motion`)
 - **Ícones:** Lucide React
-- **Roteamento:** React Router DOM 7 (multi-page: `/`, `/servicos`, `/galeria`, `/privacidade`, `/brandbook`)
-- **QR Code Pix:** `qrcode.react`
+- **Roteamento:** React Router DOM 7 (multi-page + admin routes)
+- **QR Code:** `qrcode.react` (Pix + sessões faciais)
+- **Reconhecimento Facial:** `face-api.js` (TensorFlow.js, processa no browser)
+
+### Backend
+- **Server:** Express 5
+- **ORM:** Drizzle ORM (type-safe, queries parametrizadas)
+- **Banco:** PostgreSQL via Neon Database (serverless)
+- **Auth:** JWT (8h) + bcrypt (12 rounds) + blacklist pós-logout
+- **Segurança:** express-rate-limit, sanitização XSS, error IDs (UUID)
+- **Deploy:** Replit (backend) + Netlify (frontend estático)
 
 ## Regras de Negócio
 
@@ -86,8 +96,36 @@ Cada seção da home exibe um número grande (00–10) no canto como elemento de
 2. **Conteúdo centralizado:** Todo o conteúdo textual está em `src/data/content.ts`, organizado por seção/rota. Facilita manutenção, futura integração com CMS headless e tradução.
 3. **Design tokens via `@theme`:** Tailwind 4 declarativo, sem arquivo de config — mudar uma cor propaga por todo o projeto.
 4. **Framer Motion com `viewport.once`:** animações disparam uma vez por reveal (não repetem ao rolar pra cima e voltar).
-5. **Sem backend ainda:** Site estático, ideal para deploy em CDN. Preparado para integração futura de gateway de pagamento (doações) e formulário de contato.
+5. **Backend em Express 5:** API REST com Drizzle ORM + Neon PostgreSQL. Sistema de ponto eletrônico com geofencing GPS, reconhecimento facial (face-api.js via QR Code mobile), workflow de ajustes e espelho mensal.
 6. **LGPD:** Banner de cookies + política completa. Nenhum tracker ativo até agora — a estrutura está pronta para receber GA4 quando aprovado, consumindo `preferences.analytics` via `useCookieConsent()`.
+
+## Sistema de Ponto Eletrônico
+
+### Regras trabalhistas
+- **Tolerância:** 10 min (CLT art. 58 §1º)
+- **Intervalo:** 1h almoço (futuro: 15min também)
+- **Banco de horas:** 12 meses compensação
+- **Horas extras:** 50% seg-sex, 75% sáb/dom/feriado (CCT SINDISAÚDE)
+- **Fechamento mensal:** dia 20
+- **Geofencing:** GPS Haversine, raio 100m da sede (R. Acari, 50, Manaus-AM)
+
+### Reconhecimento facial
+- **Obrigatório** para Entrada e Saída
+- **Opcional** para Saída/Volta Almoço (só GPS)
+- **Tecnologia:** face-api.js (TensorFlow.js) — processamento 100% no browser do funcionário
+- **Dois modos:** webcam do computador OU QR Code pelo celular (sessão temporária 5min)
+- **Armazenamento:** apenas embedding numérico (128 floats), nenhuma foto salva (LGPD)
+- **Threshold:** distância euclidiana < 0.6 para match
+
+### Perfis de acesso
+- **Admin:** tudo (CRUD funcionários, aprovar ajustes, ver todos os pontos, cadastrar rostos)
+- **Gestor:** mesmo que admin (futuro: restrito ao seu departamento)
+- **Funcionário:** bater ponto, solicitar ajustes, ver espelho próprio
+
+### Sidebar por departamento
+- Estrutura extensível com grupos colapsáveis
+- Atual: RH (ponto, funcionários, ajustes, espelho)
+- Futuros: Financeiro, Exames (rotas preparadas)
 
 ## Estado de Doações (Pré-Integração)
 

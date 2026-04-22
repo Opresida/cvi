@@ -3,6 +3,7 @@ import { Routes, Route, useLocation } from "react-router-dom";
 import { Home } from "@/pages/Home";
 import { CookieConsent } from "@/components/layout/CookieConsent";
 import { SplashLoader } from "@/components/layout/SplashLoader";
+import { FaceMobile } from "@/pages/FaceMobile";
 import { AdminLogin } from "@/pages/admin/Login";
 import { Dashboard } from "@/pages/admin/Dashboard";
 import { DashboardHome } from "@/pages/admin/DashboardHome";
@@ -65,6 +66,9 @@ function App() {
           <Route path="/galeria" element={<Galeria />} />
           <Route path="/privacidade" element={<Privacidade />} />
           <Route path="/brandbook" element={<Brandbook />} />
+
+          {/* Reconhecimento facial via QR Code (celular) */}
+          <Route path="/face/:sessionId" element={<FaceMobile />} />
 
           {/* Área administrativa */}
           <Route path="/admin" element={<AdminLogin />} />
