@@ -16,17 +16,29 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-const ALLOWED_ORIGINS = [
-  "http://localhost:5000",
-  "https://www.cviam.com.br",
-];
+function buildAllowedOrigins(): string[] {
+  const origins: string[] = [
+    "http://localhost:5000",
+    "https://www.cviam.com.br",
+  ];
+
+  if (process.env.REPLIT_DEV_DOMAIN) {
+    origins.push(`https://${process.env.REPLIT_DEV_DOMAIN}`);
+    origins.push(`https://${process.env.REPLIT_DEV_DOMAIN}:5000`);
+  }
+
+  if (process.env.FRONTEND_URL && !origins.includes(process.env.FRONTEND_URL)) {
+    origins.push(process.env.FRONTEND_URL);
+  }
+
+  return origins;
+}
+
+const ALLOWED_ORIGINS = buildAllowedOrigins();
 
 function isAllowedOrigin(origin: string | undefined): boolean {
   if (!origin) return false;
-  if (ALLOWED_ORIGINS.includes(origin)) return true;
-  if (/^https?:\/\/([a-z0-9-]+\.)*replit\.dev$/i.test(origin)) return true;
-  if (/^https?:\/\/([a-z0-9-]+\.)*repl\.co$/i.test(origin)) return true;
-  return false;
+  return ALLOWED_ORIGINS.includes(origin);
 }
 
 // Middleware
@@ -95,6 +107,16 @@ app.get("/{*splat}", (_req, res) => {
 
 app.listen(Number(PORT), "0.0.0.0", () => {
   console.log(`🟢 CVI rodando na porta ${PORT} (0.0.0.0)`);
+  console.log(`   Origens CORS aceitas: ${ALLOWED_ORIGINS.join(", ")}`);
+
+  fetch(`http://localhost:${PORT}/api/health`)
+    .then((res) => res.json())
+    .then((data) => {
+      console.log(`✅ Health check OK — ${JSON.stringify(data)}`);
+    })
+    .catch((err) => {
+      console.error(`❌ Health check falhou: ${err.message}`);
+    });
 });
 
 export default app;
