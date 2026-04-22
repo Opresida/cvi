@@ -42,16 +42,21 @@ function isAllowedOrigin(origin: string | undefined): boolean {
   return ALLOWED_ORIGINS.includes(origin);
 }
 
-// Middleware
-app.use(cors({
-  origin: (origin, callback) => {
-    if (!origin || isAllowedOrigin(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error(`Origem não permitida pelo CORS: ${origin}`));
-    }
-  },
-  credentials: true,
+// Middleware — CORS com log de rejeição
+app.use(cors((req, callback) => {
+  const origin = req.header("Origin");
+  if (!origin || isAllowedOrigin(origin)) {
+    callback(null, { origin: true, credentials: true });
+  } else {
+    const ip = (req.headers["x-forwarded-for"] as string)?.split(",")[0]?.trim()
+      || req.socket?.remoteAddress
+      || "unknown";
+    const ua = (req.headers["user-agent"] as string || "").slice(0, 80);
+    console.warn(
+      `⛔ [CORS] Bloqueado — origem="${origin}" ip=${ip} path=${req.path} ua="${ua}"`
+    );
+    callback(new Error(`Origem não permitida pelo CORS: ${origin}`));
+  }
 }));
 app.use(express.json({ limit: "1mb" }));
 app.use(cookieParser());
