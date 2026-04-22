@@ -72,8 +72,8 @@ app.get("/{*splat}", (_req, res) => {
   res.sendFile(path.join(distPath, "index.html"));
 });
 
-app.listen(PORT, () => {
-  console.log(`🟢 CVI rodando na porta ${PORT}`);
+app.listen(Number(PORT), "0.0.0.0", () => {
+  console.log(`🟢 CVI rodando na porta ${PORT} (0.0.0.0)`);
 });
 
 export default app;
