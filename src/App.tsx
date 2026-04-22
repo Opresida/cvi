@@ -11,6 +11,9 @@ import { Ponto } from "@/pages/admin/Ponto";
 import { Employees } from "@/pages/admin/Employees";
 import { Adjustments } from "@/pages/admin/Adjustments";
 import { Timesheet } from "@/pages/admin/Timesheet";
+import { Vacations } from "@/pages/admin/Vacations";
+import { Treatments } from "@/pages/admin/Treatments";
+import { Paystubs } from "@/pages/admin/Paystubs";
 
 // Lazy-loaded routes
 const Servicos = lazy(() =>
@@ -78,6 +81,9 @@ function App() {
             <Route path="rh/funcionarios" element={<Employees />} />
             <Route path="rh/ajustes" element={<Adjustments />} />
             <Route path="rh/espelho" element={<Timesheet />} />
+            <Route path="rh/ferias" element={<Vacations />} />
+            <Route path="rh/tratamento" element={<Treatments />} />
+            <Route path="rh/contracheques" element={<Paystubs />} />
           </Route>
 
           <Route path="*" element={<NotFound />} />

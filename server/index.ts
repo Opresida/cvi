@@ -10,6 +10,12 @@ import pontoRoutes from "./routes/ponto";
 import employeesRoutes from "./routes/employees";
 import adjustmentsRoutes from "./routes/adjustments";
 import faceRoutes from "./routes/face";
+import salaryRoutes from "./routes/salary";
+import vacationsRoutes from "./routes/vacations";
+import treatmentsRoutes from "./routes/treatments";
+import exportsRoutes from "./routes/exports";
+import paystubsRoutes from "./routes/paystubs";
+import { startAutoApproveScheduler } from "./utils/autoApproveTreatments";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -96,6 +102,11 @@ app.use("/api/ponto", pontoRoutes);
 app.use("/api/employees", employeesRoutes);
 app.use("/api/adjustments", adjustmentsRoutes);
 app.use("/api/face", faceRoutes);
+app.use("/api/salary", salaryRoutes);
+app.use("/api/vacations", vacationsRoutes);
+app.use("/api/treatments", treatmentsRoutes);
+app.use("/api/exports", exportsRoutes);
+app.use("/api/paystubs", paystubsRoutes);
 
 // Health check
 app.get("/api/health", (_req, res) => {
@@ -114,6 +125,9 @@ app.get("/{*splat}", (_req, res) => {
 app.listen(Number(PORT), "0.0.0.0", () => {
   console.log(`🟢 CVI rodando na porta ${PORT} (0.0.0.0)`);
   console.log(`   Origens CORS aceitas: ${ALLOWED_ORIGINS.join(", ")}`);
+
+  // Scheduler interno: auto-aprovação de tratamentos após 24h
+  startAutoApproveScheduler();
 
   fetch(`http://localhost:${PORT}/api/health`)
     .then((res) => res.json())

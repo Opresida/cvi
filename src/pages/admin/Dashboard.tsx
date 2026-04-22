@@ -16,9 +16,13 @@ import {
   Save,
   AlertCircle,
   Check,
+  Plane,
+  Calculator,
+  Receipt,
 } from "lucide-react";
 import logoImg from "@/assets/images/logo-white.png";
 import { PasswordInput } from "@/components/ui/PasswordInput";
+import { PendingTreatmentAlert } from "@/components/admin/PendingTreatmentAlert";
 
 const API_URL = "";
 
@@ -65,6 +69,9 @@ const navGroups: NavGroup[] = [
       { to: "/admin/dashboard/rh/funcionarios", icon: Users, label: "Funcionários", roles: ["admin", "gestor"] },
       { to: "/admin/dashboard/rh/ajustes", icon: ClipboardCheck, label: "Ajustes de Ponto", roles: ["admin", "gestor", "funcionario"] },
       { to: "/admin/dashboard/rh/espelho", icon: FileText, label: "Espelho de Ponto", roles: ["admin", "gestor", "funcionario"] },
+      { to: "/admin/dashboard/rh/ferias", icon: Plane, label: "Férias", roles: ["admin", "gestor", "funcionario"] },
+      { to: "/admin/dashboard/rh/tratamento", icon: Calculator, label: "Tratamento", roles: ["admin", "gestor"] },
+      { to: "/admin/dashboard/rh/contracheques", icon: Receipt, label: "Contracheques", roles: ["admin", "gestor", "funcionario"] },
     ],
   },
   // Futuros departamentos:
@@ -404,6 +411,7 @@ export function Dashboard() {
           </div>
         </header>
 
+        <PendingTreatmentAlert userId={user.id} />
         <main className="p-4 sm:p-6 lg:p-8">
           <Outlet context={{ user }} />
         </main>

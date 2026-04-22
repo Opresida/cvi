@@ -1,20 +1,33 @@
 import { useState, useEffect } from "react";
-import { Clock, Users, CalendarCheck, Activity } from "lucide-react";
+import { Clock, Users, CalendarCheck, Activity, DollarSign } from "lucide-react";
 import { useOutletContext } from "react-router-dom";
 
 const API_URL = "";
 function getToken() { return localStorage.getItem("cvi-token") || ""; }
 
 interface UserData {
+  id: number;
   name: string;
   role: string;
   department: string | null;
+}
+
+interface SalaryCurrent {
+  grossSalary: string;
+  netSalary: string;
+  effectiveFrom: string;
+}
+
+function formatBRL(v: string | number) {
+  const n = typeof v === "string" ? parseFloat(v) : v;
+  return n.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 }
 
 export function DashboardHome() {
   const { user } = useOutletContext<{ user: UserData }>();
   const [stats, setStats] = useState({ employees: 0, todayPunches: 0 });
   const [now, setNow] = useState(new Date());
+  const [mySalary, setMySalary] = useState<SalaryCurrent | null>(null);
 
   const greeting =
     now.getHours() < 12
@@ -69,6 +82,22 @@ export function DashboardHome() {
 
     fetchStats();
   }, [user.role]);
+
+  // Buscar próprio salário
+  useEffect(() => {
+    async function fetchMySalary() {
+      try {
+        const res = await fetch(`${API_URL}/api/salary/${user.id}/current`, {
+          headers: { Authorization: `Bearer ${getToken()}` },
+        });
+        if (res.ok) {
+          const data = await res.json();
+          setMySalary(data.salary);
+        }
+      } catch { /* silently ignore */ }
+    }
+    if (user.id) fetchMySalary();
+  }, [user.id]);
 
   const isAdmin = user.role === "admin" || user.role === "gestor";
 
@@ -131,6 +160,29 @@ export function DashboardHome() {
           </div>
         </div>
       </div>
+
+      {/* Meu salário */}
+      {mySalary && (
+        <div className="mb-6 sm:mb-8 bg-white rounded-2xl border border-neutral-200 p-4 sm:p-6">
+          <div className="flex items-center gap-2 mb-3">
+            <DollarSign size={18} className="text-primary-700" aria-hidden="true" />
+            <h2 className="text-base sm:text-lg font-bold text-neutral-900">Meu salário atual</h2>
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <p className="text-xs text-neutral-500 uppercase tracking-wider font-semibold">Bruto</p>
+              <p className="text-xl sm:text-2xl font-bold text-neutral-900 tabular-nums">{formatBRL(mySalary.grossSalary)}</p>
+            </div>
+            <div>
+              <p className="text-xs text-neutral-500 uppercase tracking-wider font-semibold">Líquido</p>
+              <p className="text-xl sm:text-2xl font-bold text-accent-600 tabular-nums">{formatBRL(mySalary.netSalary)}</p>
+            </div>
+          </div>
+          <p className="text-xs text-neutral-400 mt-3">
+            Vigente desde {new Date(mySalary.effectiveFrom + "T12:00:00").toLocaleDateString("pt-BR", { day: "2-digit", month: "long", year: "numeric" })}
+          </p>
+        </div>
+      )}
 
       <div className="bg-white rounded-2xl border border-neutral-200 p-4 sm:p-6">
         <h2 className="text-base sm:text-lg font-bold text-neutral-900 mb-3 sm:mb-4">Informações da Sessão</h2>

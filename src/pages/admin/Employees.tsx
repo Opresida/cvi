@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import {
   UserPlus, Search, Edit2, UserX, X, Save, Users, RefreshCw, ScanFace,
+  DollarSign, Plus, Trash2,
 } from "lucide-react";
 import { FaceCapture } from "@/components/ui/FaceCapture";
 import { PasswordInput } from "@/components/ui/PasswordInput";
@@ -34,6 +35,24 @@ const emptyForm = {
   hasLunchBreak: true,
 };
 
+interface SalaryEntry {
+  id: number;
+  grossSalary: string;
+  netSalary: string;
+  effectiveFrom: string;
+  notes: string | null;
+  createdAt: string;
+}
+
+function formatBRL(v: string | number) {
+  const n = typeof v === "string" ? parseFloat(v) : v;
+  return n.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+}
+
+function formatDateBR(d: string) {
+  return new Date(d + "T12:00:00").toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit", year: "numeric" });
+}
+
 export function Employees() {
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [search, setSearch] = useState("");
@@ -44,6 +63,12 @@ export function Employees() {
   const [msg, setMsg] = useState("");
   const [confirmDelete, setConfirmDelete] = useState<number | null>(null);
   const [faceRegisterId, setFaceRegisterId] = useState<number | null>(null);
+
+  // Gerenciamento de salário (dentro do modal de edição)
+  const [salaryHistory, setSalaryHistory] = useState<SalaryEntry[]>([]);
+  const [showSalaryForm, setShowSalaryForm] = useState(false);
+  const [salaryForm, setSalaryForm] = useState({ gross: "", net: "", effectiveFrom: new Date().toISOString().slice(0, 10), notes: "" });
+  const [salaryLoading, setSalaryLoading] = useState(false);
 
   const fetchEmployees = useCallback(async () => {
     try {
@@ -94,6 +119,22 @@ export function Employees() {
     }
   };
 
+  const fetchSalaryHistory = useCallback(async (userId: number) => {
+    try {
+      const res = await fetch(`${API_URL}/api/salary/${userId}/history`, {
+        headers: { Authorization: `Bearer ${getToken()}` },
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setSalaryHistory(data.history);
+      } else {
+        setSalaryHistory([]);
+      }
+    } catch {
+      setSalaryHistory([]);
+    }
+  }, []);
+
   const startEdit = (emp: Employee) => {
     setEditingId(emp.id);
     setForm({
@@ -107,7 +148,58 @@ export function Employees() {
       lunchDurationMinutes: emp.lunchDurationMinutes,
       hasLunchBreak: emp.hasLunchBreak,
     });
+    setShowSalaryForm(false);
+    setSalaryForm({ gross: "", net: "", effectiveFrom: new Date().toISOString().slice(0, 10), notes: "" });
+    fetchSalaryHistory(emp.id);
     setShowForm(true);
+  };
+
+  const handleAddSalary = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingId) return;
+    setSalaryLoading(true);
+    try {
+      const res = await fetch(`${API_URL}/api/salary/${editingId}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${getToken()}` },
+        body: JSON.stringify({
+          grossSalary: parseFloat(salaryForm.gross),
+          netSalary: parseFloat(salaryForm.net),
+          effectiveFrom: salaryForm.effectiveFrom,
+          notes: salaryForm.notes || undefined,
+        }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setMsg("Salário registrado");
+        setShowSalaryForm(false);
+        setSalaryForm({ gross: "", net: "", effectiveFrom: new Date().toISOString().slice(0, 10), notes: "" });
+        fetchSalaryHistory(editingId);
+      } else {
+        setMsg(data.error || "Erro ao registrar salário");
+      }
+    } catch {
+      setMsg("Erro de conexão");
+    } finally {
+      setSalaryLoading(false);
+      setTimeout(() => setMsg(""), 3000);
+    }
+  };
+
+  const handleDeleteSalary = async (entryId: number) => {
+    if (!editingId) return;
+    if (!confirm("Remover esse registro de salário?")) return;
+    try {
+      const res = await fetch(`${API_URL}/api/salary/entry/${entryId}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${getToken()}` },
+      });
+      if (res.ok) {
+        fetchSalaryHistory(editingId);
+        setMsg("Registro removido");
+        setTimeout(() => setMsg(""), 3000);
+      }
+    } catch { /* ignore */ }
   };
 
   const handleDeactivate = async (id: number) => {
@@ -323,6 +415,112 @@ export function Employees() {
                 </button>
               </div>
             </form>
+
+            {/* Seção Salário — apenas em modo edição */}
+            {editingId && (
+              <div className="mt-6 pt-6 border-t-2 border-neutral-200">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-base sm:text-lg font-bold text-neutral-900 flex items-center gap-2">
+                    <DollarSign size={18} className="text-primary-700" />
+                    Salário
+                  </h3>
+                  {!showSalaryForm && (
+                    <button type="button" onClick={() => setShowSalaryForm(true)}
+                      className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-semibold text-primary-700 hover:bg-primary-50 px-3 py-1.5 rounded-lg">
+                      <Plus size={14} /> Novo registro
+                    </button>
+                  )}
+                </div>
+
+                {/* Form inline de novo salário */}
+                {showSalaryForm && (
+                  <div className="mb-4 p-4 bg-primary-50 border border-primary-200 rounded-xl">
+                    <p className="text-xs font-semibold text-primary-900 mb-3 uppercase tracking-wider">Registrar novo salário</p>
+                    <div className="grid sm:grid-cols-2 gap-3 mb-3">
+                      <div>
+                        <label className="block text-xs font-semibold text-neutral-700 mb-1">Bruto (R$)</label>
+                        <input type="number" step="0.01" min="0" required
+                          value={salaryForm.gross}
+                          onChange={e => setSalaryForm({...salaryForm, gross: e.target.value})}
+                          className="w-full px-3 py-2 rounded-lg border border-neutral-300 text-sm bg-white focus:border-primary-500 outline-none" />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-semibold text-neutral-700 mb-1">Líquido (R$)</label>
+                        <input type="number" step="0.01" min="0" required
+                          value={salaryForm.net}
+                          onChange={e => setSalaryForm({...salaryForm, net: e.target.value})}
+                          className="w-full px-3 py-2 rounded-lg border border-neutral-300 text-sm bg-white focus:border-primary-500 outline-none" />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-semibold text-neutral-700 mb-1">Vigência a partir de</label>
+                        <input type="date" required
+                          value={salaryForm.effectiveFrom}
+                          onChange={e => setSalaryForm({...salaryForm, effectiveFrom: e.target.value})}
+                          className="w-full px-3 py-2 rounded-lg border border-neutral-300 text-sm bg-white focus:border-primary-500 outline-none" />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-semibold text-neutral-700 mb-1">Observação (opcional)</label>
+                        <input type="text" maxLength={500}
+                          value={salaryForm.notes}
+                          placeholder="Ex: Reajuste anual, promoção..."
+                          onChange={e => setSalaryForm({...salaryForm, notes: e.target.value})}
+                          className="w-full px-3 py-2 rounded-lg border border-neutral-300 text-sm bg-white focus:border-primary-500 outline-none" />
+                      </div>
+                    </div>
+                    <div className="flex justify-end gap-2">
+                      <button type="button" onClick={() => setShowSalaryForm(false)} disabled={salaryLoading}
+                        className="px-4 py-2 rounded-lg text-sm text-neutral-700 hover:bg-neutral-100 font-medium">
+                        Cancelar
+                      </button>
+                      <button type="button" onClick={handleAddSalary} disabled={salaryLoading || !salaryForm.gross || !salaryForm.net}
+                        className="inline-flex items-center gap-1.5 bg-primary-700 hover:bg-primary-800 text-white text-sm font-semibold px-4 py-2 rounded-lg disabled:opacity-50">
+                        <Save size={14} /> {salaryLoading ? "Salvando..." : "Registrar"}
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {/* Histórico */}
+                {salaryHistory.length === 0 ? (
+                  <p className="text-sm text-neutral-400 text-center py-4">Nenhum salário registrado ainda.</p>
+                ) : (
+                  <div className="space-y-2">
+                    {salaryHistory.map((entry, idx) => {
+                      const isCurrent = idx === 0 && new Date(entry.effectiveFrom) <= new Date();
+                      return (
+                        <div key={entry.id}
+                          className={`flex items-start justify-between gap-3 p-3 rounded-xl border ${isCurrent ? "bg-accent-50 border-accent-200" : "bg-neutral-50 border-neutral-200"}`}>
+                          <div className="min-w-0 flex-1">
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <span className="text-sm font-bold text-neutral-900 tabular-nums">
+                                {formatBRL(entry.grossSalary)}
+                              </span>
+                              <span className="text-xs text-neutral-500 tabular-nums">
+                                (líq {formatBRL(entry.netSalary)})
+                              </span>
+                              {isCurrent && (
+                                <span className="text-[10px] uppercase tracking-wider font-bold text-accent-700 bg-accent-100 px-1.5 py-0.5 rounded-full">
+                                  vigente
+                                </span>
+                              )}
+                            </div>
+                            <p className="text-xs text-neutral-500 mt-0.5">
+                              A partir de <strong>{formatDateBR(entry.effectiveFrom)}</strong>
+                              {entry.notes && ` — ${entry.notes}`}
+                            </p>
+                          </div>
+                          <button type="button" onClick={() => handleDeleteSalary(entry.id)}
+                            aria-label="Remover registro"
+                            className="shrink-0 p-1.5 rounded-lg text-neutral-400 hover:bg-secondary-50 hover:text-secondary-600 transition-colors">
+                            <Trash2 size={14} />
+                          </button>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </div>
       )}

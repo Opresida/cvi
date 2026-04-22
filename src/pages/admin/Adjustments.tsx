@@ -1,6 +1,6 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useOutletContext } from "react-router-dom";
-import { ClipboardCheck, Check, X, Plus, Send } from "lucide-react";
+import { ClipboardCheck, Check, X, Plus, Send, Paperclip, FileText } from "lucide-react";
 
 const API_URL = "";
 function getToken() { return localStorage.getItem("cvi-token") || ""; }
@@ -13,7 +13,7 @@ interface Adjustment {
   requestedType: string;
   requestedTimestamp: string;
   reason: string;
-  attachmentUrl: string | null;
+  attachmentFileId: number | null;
   status: string;
   createdAt: string;
   reviewNotes?: string | null;
@@ -59,6 +59,45 @@ export function Adjustments() {
     time: "08:00",
     reason: "",
   });
+  const [attachment, setAttachment] = useState<File | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
+    const f = e.target.files?.[0];
+    if (!f) { setAttachment(null); return; }
+    if (f.size > 10 * 1024 * 1024) {
+      setMsg("Arquivo excede o limite de 10 MB");
+      setTimeout(() => setMsg(""), 4000);
+      e.target.value = "";
+      return;
+    }
+    const allowed = ["application/pdf", "image/jpeg", "image/png"];
+    if (!allowed.includes(f.type)) {
+      setMsg("Apenas PDF, JPG ou PNG são permitidos");
+      setTimeout(() => setMsg(""), 4000);
+      e.target.value = "";
+      return;
+    }
+    setAttachment(f);
+  }
+
+  function openAttachment(adjId: number) {
+    const token = getToken();
+    // Fetch com auth header (não dá pra usar simples <a href>)
+    fetch(`${API_URL}/api/adjustments/${adjId}/attachment`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then((res) => { if (!res.ok) throw new Error("Erro"); return res.blob(); })
+      .then((blob) => {
+        const url = URL.createObjectURL(blob);
+        window.open(url, "_blank");
+        setTimeout(() => URL.revokeObjectURL(url), 60000);
+      })
+      .catch(() => {
+        setMsg("Não foi possível abrir o anexo");
+        setTimeout(() => setMsg(""), 4000);
+      });
+  }
 
   const fetchData = useCallback(async () => {
     try {
@@ -83,19 +122,23 @@ export function Adjustments() {
     setMsg("");
     try {
       const timestamp = `${form.date}T${form.time}:00Z`;
+      const fd = new FormData();
+      fd.append("requestedType", form.requestedType);
+      fd.append("requestedTimestamp", timestamp);
+      fd.append("reason", form.reason);
+      if (attachment) fd.append("attachment", attachment);
+
       const res = await fetch(`${API_URL}/api/adjustments`, {
         method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${getToken()}` },
-        body: JSON.stringify({
-          requestedType: form.requestedType,
-          requestedTimestamp: timestamp,
-          reason: form.reason,
-        }),
+        headers: { Authorization: `Bearer ${getToken()}` }, // sem Content-Type: navegador define com boundary
+        body: fd,
       });
       const data = await res.json();
       if (res.ok) {
         setMsg("Solicitação enviada com sucesso! Aguarde a aprovação do RH.");
         setForm({ requestedType: "entrada", date: new Date().toISOString().slice(0, 10), time: "08:00", reason: "" });
+        setAttachment(null);
+        if (fileInputRef.current) fileInputRef.current.value = "";
         setTab("mine");
         fetchData();
       } else {
@@ -249,6 +292,43 @@ export function Adjustments() {
               <p className="text-xs text-neutral-400 mt-1">Mínimo 5 caracteres. Seja claro no motivo para facilitar a aprovação.</p>
             </div>
 
+            {/* Upload de anexo */}
+            <div>
+              <label htmlFor="adj-attachment" className="block text-sm font-semibold text-neutral-800 mb-2">
+                Anexo <span className="text-xs font-normal text-neutral-400">(opcional — atestado, comprovante)</span>
+              </label>
+              <div className="flex items-center gap-3 flex-wrap">
+                <input
+                  ref={fileInputRef}
+                  id="adj-attachment"
+                  type="file"
+                  accept="application/pdf,image/jpeg,image/png"
+                  onChange={handleFileSelect}
+                  className="hidden"
+                />
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-neutral-100 hover:bg-neutral-200 text-neutral-700 text-sm font-medium"
+                >
+                  <Paperclip size={16} />
+                  {attachment ? "Trocar arquivo" : "Escolher arquivo"}
+                </button>
+                {attachment && (
+                  <div className="flex items-center gap-2 text-xs">
+                    <FileText size={14} className="text-primary-700" />
+                    <span className="text-neutral-700 font-medium truncate max-w-[200px]">{attachment.name}</span>
+                    <span className="text-neutral-400 tabular-nums">({(attachment.size / 1024).toFixed(0)} KB)</span>
+                    <button type="button" onClick={() => { setAttachment(null); if (fileInputRef.current) fileInputRef.current.value = ""; }}
+                      className="text-secondary-600 hover:underline text-xs font-semibold">
+                      Remover
+                    </button>
+                  </div>
+                )}
+              </div>
+              <p className="text-xs text-neutral-400 mt-1">PDF, JPG ou PNG · máximo 10 MB</p>
+            </div>
+
             <button
               type="submit"
               disabled={loading || form.reason.trim().length < 5}
@@ -292,6 +372,12 @@ export function Adjustments() {
                     <p className="text-sm text-neutral-600">
                       <strong>Motivo:</strong> {adj.reason}
                     </p>
+                    {adj.attachmentFileId && (
+                      <button type="button" onClick={() => openAttachment(adj.id)}
+                        className="mt-2 inline-flex items-center gap-1.5 text-xs text-primary-700 font-semibold hover:underline">
+                        <Paperclip size={12} /> Ver anexo
+                      </button>
+                    )}
                     {adj.reviewNotes && (
                       <p className="text-xs text-neutral-500 mt-2 p-2 bg-neutral-50 rounded-lg">
                         <strong>Obs. do RH:</strong> {adj.reviewNotes}
@@ -350,11 +436,11 @@ export function Adjustments() {
                     <p className="text-xs sm:text-sm text-neutral-700">
                       <strong>Motivo:</strong> {adj.reason}
                     </p>
-                    {adj.attachmentUrl && (
-                      <a href={adj.attachmentUrl} target="_blank" rel="noopener noreferrer"
-                        className="text-xs text-primary-700 font-semibold hover:underline mt-1 inline-block">
-                        Ver documento anexo
-                      </a>
+                    {adj.attachmentFileId && (
+                      <button type="button" onClick={() => openAttachment(adj.id)}
+                        className="mt-2 inline-flex items-center gap-1.5 text-xs text-primary-700 font-semibold hover:underline">
+                        <Paperclip size={12} /> Ver documento anexo
+                      </button>
                     )}
                   </div>
 
