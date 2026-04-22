@@ -108,7 +108,7 @@
 
 ## 🐛 Bugs Conhecidos
 
-- Nenhum bug ativo identificado até o momento.
+- [ ] **Replit: erro de conexão com servidor no login** — preview carrega mas API não conecta ao banco. Possíveis causas: (1) CORS bloqueando por domínio diferente do configurado em FRONTEND_URL, (2) DATABASE_URL no Secret do Replit pode ter formatação diferente do .env local (verificar channel_binding, sslmode), (3) Verificar se `npm run db:push` rodou com sucesso no Replit, (4) Checar logs do Express no Shell para ver o erro real. Prioridade: resolver amanhã.
 
 ## 🚀 Entregas Recentes (changelog resumido)
 
