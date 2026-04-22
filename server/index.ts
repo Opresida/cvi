@@ -15,10 +15,31 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const app = express();
 const PORT = process.env.PORT || 3001;
-const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:5000";
+
+const ALLOWED_ORIGINS = [
+  "http://localhost:5000",
+  "https://www.cviam.com.br",
+];
+
+function isAllowedOrigin(origin: string | undefined): boolean {
+  if (!origin) return false;
+  if (ALLOWED_ORIGINS.includes(origin)) return true;
+  if (/^https?:\/\/([a-z0-9-]+\.)*replit\.dev$/i.test(origin)) return true;
+  if (/^https?:\/\/([a-z0-9-]+\.)*repl\.co$/i.test(origin)) return true;
+  return false;
+}
 
 // Middleware
-app.use(cors({ origin: FRONTEND_URL, credentials: true }));
+app.use(cors({
+  origin: (origin, callback) => {
+    if (!origin || isAllowedOrigin(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error(`Origem não permitida pelo CORS: ${origin}`));
+    }
+  },
+  credentials: true,
+}));
 app.use(express.json({ limit: "1mb" }));
 app.use(cookieParser());
 
