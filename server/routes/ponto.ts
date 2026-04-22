@@ -3,7 +3,7 @@ import { db } from "../db";
 import { punchRecords, users, systemSettings } from "../db/schema";
 import { eq, desc, and, gte, lte, sql } from "drizzle-orm";
 import { authMiddleware, gestorOrAdmin, generateErrorId, type AuthRequest } from "../middleware/auth";
-import { isWithinGeofence } from "../utils/geofence";
+import { calculateDistance } from "../utils/geofence";
 import { sanitizeHtml } from "../utils/sanitize";
 
 const router = Router();
@@ -85,21 +85,40 @@ router.post("/registrar", async (req: AuthRequest, res) => {
       return res.status(409).json({ error: "Ponto já registrado nos últimos 60 segundos" });
     }
 
-    // Geofencing
+    // Geofencing com 3 faixas:
+    //   0 a geofenceRadius (100m)         → valido
+    //   geofenceRadius a geofenceMaxRadius (100–350m) → fora_perimetro (registra, flagga p/ gestor)
+    //   acima de geofenceMaxRadius (>350m) → rejeita com 403
     const settings = await getSettings();
     let status: "valido" | "fora_perimetro" = "valido";
     let distanceFromSede: number | null = null;
 
     if (coords.lat !== undefined && coords.lon !== undefined) {
-      const geo = isWithinGeofence(
+      const rawDistance = calculateDistance(
         coords.lat,
         coords.lon,
         parseFloat(String(settings.sedeLatitude)),
-        parseFloat(String(settings.sedeLongitude)),
-        settings.geofenceRadius
+        parseFloat(String(settings.sedeLongitude))
       );
-      distanceFromSede = geo.distance;
-      if (!geo.within) {
+      distanceFromSede = Math.round(rawDistance * 100) / 100;
+
+      const innerRadius = settings.geofenceRadius;
+      const maxRadius = settings.geofenceMaxRadius;
+
+      if (rawDistance > maxRadius) {
+        return res.status(403).json({
+          error: `Você está a ${Math.round(rawDistance)}m da sede. O limite máximo para registro de ponto é ${maxRadius}m. Registro bloqueado.`,
+          geofence: {
+            within: false,
+            distance: distanceFromSede,
+            radius: innerRadius,
+            maxRadius,
+            blocked: true,
+          },
+        });
+      }
+
+      if (rawDistance > innerRadius) {
         status = "fora_perimetro";
       }
     }
@@ -129,6 +148,7 @@ router.post("/registrar", async (req: AuthRequest, res) => {
         within: status === "valido",
         distance: distanceFromSede,
         radius: settings.geofenceRadius,
+        maxRadius: settings.geofenceMaxRadius,
       },
     });
   } catch (err) {

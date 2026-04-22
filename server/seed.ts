@@ -14,13 +14,14 @@ async function seed() {
       sedeLatitude: "-3.0820000",
       sedeLongitude: "-59.9740000",
       geofenceRadius: 100,
+      geofenceMaxRadius: 350,
       toleranceMinutes: 10,
       closingDay: 20,
       bankHoursMaxMonths: 12,
       overtimeWeekday: "50.00",
       overtimeWeekend: "75.00",
     });
-    console.log("   ✅ Configurações criadas (geofence 100m, tolerância 10min, fechamento dia 20)");
+    console.log("   ✅ Configurações criadas (geofence 100m / máx 350m, tolerância 10min, fechamento dia 20)");
   } catch (err: any) {
     if (err.message?.includes("unique") || err.message?.includes("duplicate")) {
       console.log("   ℹ️  Configurações já existem, pulando.");

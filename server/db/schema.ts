@@ -34,7 +34,8 @@ export const systemSettings = pgTable("system_settings", {
   // Geofencing
   sedeLatitude: numeric("sede_latitude", { precision: 10, scale: 7 }).notNull().default("-3.0820000"),
   sedeLongitude: numeric("sede_longitude", { precision: 10, scale: 7 }).notNull().default("-59.9740000"),
-  geofenceRadius: integer("geofence_radius").notNull().default(100), // metros
+  geofenceRadius: integer("geofence_radius").notNull().default(100), // metros — dentro: valido
+  geofenceMaxRadius: integer("geofence_max_radius").notNull().default(350), // metros — além: rejeitado
   // Tolerância
   toleranceMinutes: integer("tolerance_minutes").notNull().default(10),
   // Fechamento
